@@ -1,0 +1,44 @@
+@import 'normalize.css';
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wdth,wght@0,75..100,300..800;1,75..100,300..800&display=swap');
+
+:root {
+  --height-header: 56px;
+  --width-nav: 240px;
+  --width-logo: 240px;
+
+  --bg-color-auth: #f5f6fa;
+
+  --white-color: #fff;
+
+  --border-radius: 8px;
+  --box-shadow: 4px 6px 10px 0 #ccc;
+}
+
+* {
+  box-sizing: inherit;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  font-size: 62.5%;
+  box-sizing: border-box;
+}
+
+body {
+  font-size: 1.6rem;
+  font-family: 'Open Sans', sans-serif;
+  line-height: 1.6rem;
+  text-rendering: optimizeSpeed;
+}
+
+a[href] {
+  text-decoration: none;
+}
+
+button,
+input {
+  border: none;
+  outline: none;
+  background-color: transparent;
+}

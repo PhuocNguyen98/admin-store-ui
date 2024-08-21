@@ -1,0 +1,16 @@
+.wrapper {
+  height: var(--height-header);
+  background-color: var(--white-color);
+  display: flex;
+  box-shadow: 0 4px 8px 0 #ccc;
+}
+
+.logo {
+  width: var(--width-logo);
+  height: 100%;
+  background-color: #404e67;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
