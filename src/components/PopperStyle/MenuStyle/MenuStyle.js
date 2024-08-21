@@ -14,11 +14,11 @@ function MenuStyle({ items = [], anchorEl, open, onClick, onClose }) {
     if (items) {
       return items.map((item, index) => (
         <Link key={index} to={item.to}>
-          {item.separate ? <Divider /> : ''}
           <MenuItemCustom>
             <ListItemIcon>{item.icon}</ListItemIcon>
             {item.title}
           </MenuItemCustom>
+          {item.separate ? <Divider /> : ''}
         </Link>
       ));
     }
@@ -34,7 +34,7 @@ function MenuStyle({ items = [], anchorEl, open, onClick, onClose }) {
       PaperProps={{
         elevation: 0,
         sx: {
-          minWidth: 160,
+          minWidth: 200,
           overflow: 'visible',
           filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
           mt: 1.5,

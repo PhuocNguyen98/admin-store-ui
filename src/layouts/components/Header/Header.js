@@ -3,40 +3,32 @@ import styles from './Header.module.scss';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import Settings from '@mui/icons-material/Settings';
 import Logout from '@mui/icons-material/Logout';
 import MenuIcon from '@mui/icons-material/Menu';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import Typography from '@mui/material/Typography';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 import images from '~/assets/img';
 import config from '~/config';
 import MenuStyle from '~/components/PopperStyle/MenuStyle';
+import useToken from '~/hooks/useToken';
 
 const cx = classnames.bind(styles);
 
 const MENU_ITEMS = [
   {
-    icon: <AccountCircleIcon fontSize="large" />,
-    title: 'Profile',
-    to: '/',
-  },
-  {
-    icon: <Settings fontSize="large" />,
-    title: 'Settings',
-    to: '/',
-  },
-  {
     icon: <Logout fontSize="large" />,
     title: 'Logout',
     to: config.routes.logout,
-    separate: true,
+    // separate: true,
   },
 ];
 
 function Header() {
+  const { getAuth } = useToken();
+  const userAuth = getAuth();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -46,9 +38,21 @@ function Header() {
     setAnchorEl(null);
   };
 
+  const refLogo = useRef();
+  const [showSidebar, setShowSidebar] = useState(false);
+
+  const handleClickMenu = () => {
+    if (showSidebar) {
+      refLogo.current.style.width = '240px';
+    } else {
+      refLogo.current.style.width = '150px';
+    }
+    setShowSidebar(!showSidebar);
+  };
+
   return (
     <Box className={cx('wrapper')}>
-      <Box className={cx('logo')}>
+      <Box className={cx('logo')} ref={refLogo}>
         <Link to={config.routes.dashboard}>
           <img src={images.logo1} alt="Logo" />
         </Link>
@@ -64,11 +68,18 @@ function Header() {
         }}
       >
         <Box>
-          <IconButton size="large" onClick={() => alert(1)}>
+          <IconButton size="large" onClick={() => handleClickMenu()}>
             <MenuIcon fontSize="large" />
           </IconButton>
         </Box>
-        <Box onClick={handleClick}>
+        <Box
+          onClick={handleClick}
+          sx={{
+            ':hover': {
+              cursor: 'pointer',
+            },
+          }}
+        >
           <IconButton
             size="small"
             sx={{
@@ -87,18 +98,22 @@ function Header() {
               alt="Avatar"
             />
           </IconButton>
-          <Typography
-            component="span"
-            variant="h5"
-            sx={{
-              pl: 1,
-              ':hover': {
-                cursor: 'pointer',
-              },
-            }}
-          >
-            PhuocNguyen
-          </Typography>
+          {userAuth ? (
+            <Typography
+              component="span"
+              variant="h5"
+              sx={{
+                pl: 1,
+                display: 'inline-flex',
+                alignItems: 'center',
+              }}
+            >
+              {userAuth?.username}
+              <KeyboardArrowDownIcon sx={{ ml: 0.5 }} />
+            </Typography>
+          ) : (
+            ''
+          )}
         </Box>
       </Box>
       <MenuStyle
