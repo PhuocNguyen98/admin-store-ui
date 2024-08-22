@@ -30,7 +30,7 @@ const NAV_LIST = [
       {
         icon: <LayersIcon />,
         title: 'Category',
-        to: '/',
+        to: '/category',
       },
       {
         icon: <LayersIcon />,
