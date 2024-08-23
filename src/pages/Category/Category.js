@@ -101,12 +101,16 @@ const actions = [
     icon: <EditIcon />,
     title: 'Edit',
     to: '/category/edit',
-    color: 'info',
+    css: {
+      color: 'info',
+    },
   },
   {
     icon: <DeleteIcon />,
     title: 'Delete',
-    color: 'error',
+    css: {
+      color: 'error',
+    },
     onClick: () => alert(1),
   },
 ];
