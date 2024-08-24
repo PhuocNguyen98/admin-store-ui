@@ -30,12 +30,10 @@ import { loginUser } from '~/api/authApi';
 import config from '~/config';
 
 const cx = classNames.bind(styles);
-const loginSchema = yup
-  .object({
-    username: yup.string().required('Vui lòng nhập Username'),
-    password: yup.string().required('Vui lòng nhập Password'),
-  })
-  .required();
+const loginSchema = yup.object({
+  username: yup.string().required('Vui lòng nhập Username'),
+  password: yup.string().required('Vui lòng nhập Password'),
+});
 
 const themeLogin = createTheme({
   components: {
@@ -119,40 +117,40 @@ function Login({ setToken }) {
     <ThemeProvider theme={themeLogin}>
       <div className={cx('wrapper')}>
         <Container
-          component="main"
-          maxWidth="xs"
+          component='main'
+          maxWidth='xs'
           sx={{
             display: 'flex',
           }}
           className={cx('inner')}
         >
           <CssBaseline />
-          <img src={images.logo} alt="Logo" className={cx('logo')} />
+          <img src={images.logo} alt='Logo' className={cx('logo')} />
           <Box
             display={'flex'}
             flexDirection={'column'}
             alignItems={'center'}
             className={cx('body')}
           >
-            <Typography component="h1" variant="h2" className={cx('title')}>
+            <Typography component='h1' variant='h2' className={cx('title')}>
               Login
             </Typography>
-            <Box component="form" action="POST" sx={{ mt: 3 }}>
+            <Box component='form' action='POST' sx={{ mt: 3 }}>
               <Grid container spacing={3}>
                 <Grid item xs={12}>
                   <Controller
                     control={control}
-                    name="username"
+                    name='username'
                     render={({
                       field: { onChange, value },
                       fieldState: { error },
                     }) => (
                       <TextField
-                        name="username"
+                        name='username'
                         fullWidth
-                        id="username"
-                        label="Username"
-                        placeholder="Username or Email"
+                        id='username'
+                        label='Username'
+                        placeholder='Username or Email'
                         value={value}
                         onChange={onChange}
                         error={error ? true : false}
@@ -164,7 +162,7 @@ function Login({ setToken }) {
                 <Grid item xs={12}>
                   <Controller
                     control={control}
-                    name="password"
+                    name='password'
                     render={({
                       field: { onChange, value },
                       fieldState: { error },
@@ -172,22 +170,22 @@ function Login({ setToken }) {
                       <FormControl
                         error={error ? true : false}
                         fullWidth
-                        variant="outlined"
+                        variant='outlined'
                       >
-                        <InputLabel htmlFor="outlined-adornment-password">
+                        <InputLabel htmlFor='outlined-adornment-password'>
                           Password
                         </InputLabel>
                         <OutlinedInput
-                          id="password"
+                          id='password'
                           type={showPassword ? 'text' : 'password'}
                           onChange={onChange}
                           value={value}
                           endAdornment={
-                            <InputAdornment position="end">
+                            <InputAdornment position='end'>
                               <IconButton
                                 onClick={() => handleClickShowPassword()}
                                 onMouseDown={(e) => handleMouseDownPassword(e)}
-                                edge="end"
+                                edge='end'
                               >
                                 {showPassword ? (
                                   <VisibilityOff />
@@ -197,10 +195,10 @@ function Login({ setToken }) {
                               </IconButton>
                             </InputAdornment>
                           }
-                          label="Password"
+                          label='Password'
                         />
                         {error ? (
-                          <FormHelperText id="component-helper-text">
+                          <FormHelperText id='component-helper-text'>
                             {error?.message}
                           </FormHelperText>
                         ) : (
@@ -213,14 +211,14 @@ function Login({ setToken }) {
                 <Grid item xs={6}>
                   <FormControlLabel
                     control={
-                      <Checkbox value="allowRememberMe" color="primary" />
+                      <Checkbox value='allowRememberMe' color='primary' />
                     }
-                    label="Remember me"
+                    label='Remember me'
                   />
                 </Grid>
                 <Grid item xs={6} className={cx('forgot-password')}>
                   <Link
-                    to=""
+                    to=''
                     onClick={() => alert('Chức năng đang phát triển')}
                   >
                     Forgot password ?
@@ -228,9 +226,9 @@ function Login({ setToken }) {
                 </Grid>
               </Grid>
               <Button
-                type="button"
+                type='button'
                 fullWidth
-                variant="contained"
+                variant='contained'
                 sx={{ mt: 3, mb: 2 }}
                 onClick={() => onSubmit()}
               >
