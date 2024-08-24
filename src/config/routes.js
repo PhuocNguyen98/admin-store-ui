@@ -5,6 +5,8 @@ const routes = {
   category: '/category',
 };
 
-export const pages = {};
+export const category = {
+  add: '/category/add',
+};
 
 export default routes;

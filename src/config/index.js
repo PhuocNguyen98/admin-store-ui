@@ -1,6 +1,6 @@
 import routes from './routes';
-import { pages } from './routes';
+import { category } from './routes';
 
-const config = { routes, pages };
+const config = { routes, category };
 
 export default config;

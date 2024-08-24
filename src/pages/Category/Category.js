@@ -2,14 +2,16 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import Button from '@mui/material/Button';
+import Paper from '@mui/material/Paper';
 
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+
+import { Link } from 'react-router-dom';
 
 import TableStyle from '~/components/TableStyle';
-import { Paper } from '@mui/material';
-import { NavLink } from 'react-router-dom';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import config from '~/config';
 
 const DATA_CATEGORY = [
   {
@@ -150,7 +152,7 @@ function Category() {
             Manage your categories
           </Typography>
         </Box>
-        <NavLink to='/dashboard'>
+        <Link to={config.category.add}>
           <Button
             variant='contained'
             sx={{ fontSize: '1.3rem' }}
@@ -158,7 +160,7 @@ function Category() {
           >
             Add category
           </Button>
-        </NavLink>
+        </Link>
       </Box>
       <Divider />
       <Paper
