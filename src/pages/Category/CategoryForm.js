@@ -1,19 +1,17 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
-import Button from '@mui/material/Button';
-
+import Paper from '@mui/material/Paper';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
-
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-
 import { convertSlug } from '~/utils/convertSlug';
 import DropzoneStyle from '~/components/DropzoneStyle';
 import TextFieldStyle from '~/components/FormStye/TextFieldStyle';
 import TypographyStyle from '~/components/FormStye/TypographyStyle';
 import ButtonStyle from '~/components/ButtonStyle';
+import BreadcrumbStyle from '~/components/BreadcrumbStyle';
 
 const schemaCategory = yup.object().shape({
   categoryName: yup.string().required('Vui lòng nhập tên danh mục'),
@@ -46,8 +44,10 @@ function CategoryForm() {
   });
 
   return (
-    <div className='wrapper'>
+    <Box>
       <Box>
+        <BreadcrumbStyle />
+        
         <Typography
           variant='h3'
           component='h4'
@@ -72,88 +72,90 @@ function CategoryForm() {
           Create new category for the system
         </Typography>
       </Box>
-
       <Divider />
 
-      <Box width='50%' mt={3} component='form' action='POST'>
-        <Box mb={3}>
-          <TypographyStyle
-            component='label'
-            htmlFor='categoryName'
-            variant='h5'
-            isRequired={true}
-          >
-            Category name
-          </TypographyStyle>
-          <TextFieldStyle
-            control={control}
-            name='categoryName'
-            placeholder='Category name'
-          />
-        </Box>
+      <Paper elevation={6} sx={{ p: '30px', mt: 3 }}>
+        <Box width='50%' component='form' action='POST'>
+          <Box mb={3}>
+            <TypographyStyle
+              component='label'
+              htmlFor='categoryName'
+              variant='h5'
+              isRequired={true}
+            >
+              Category name
+            </TypographyStyle>
+            <TextFieldStyle
+              control={control}
+              name='categoryName'
+              placeholder='Category name'
+            />
+          </Box>
 
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Box mb={3} flex={1}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Box mb={3} flex={1}>
+              <TypographyStyle
+                component='label'
+                variant='h5'
+                htmlFor='categorySlug'
+                isRequired={true}
+                comment='Nhấn nút Generate để tạo Slug'
+              >
+                Category slug
+              </TypographyStyle>
+
+              <TextFieldStyle
+                control={control}
+                name='categorySlug'
+                disabled={true}
+                placeholder='Category slug'
+              />
+            </Box>
+            <ButtonStyle
+              sx={{ ml: 1 }}
+              variant='contained'
+              color='primary'
+              startIcon={<AutorenewIcon />}
+              disabled={!!watchCategoryName ? false : true}
+              onClick={() => handleGenerateSlug(watchCategoryName)}
+            >
+              Generate slug
+            </ButtonStyle>
+          </Box>
+
+          <Box>
             <TypographyStyle
               component='label'
               variant='h5'
               htmlFor='categorySlug'
-              isRequired={true}
-              comment='Nhấn nút Generate để tạo Slug'
             >
-              Category slug
+              Category image
             </TypographyStyle>
 
-            <TextFieldStyle
+            <DropzoneStyle
               control={control}
-              name='categorySlug'
-              disabled={true}
-              placeholder='Category slug'
+              name='categoryImage'
+              multiple={false}
             />
           </Box>
-          <ButtonStyle
-            sx={{ ml: 1 }}
-            variant='contained'
-            color='primary'
-            startIcon={<AutorenewIcon />}
-            disabled={!!watchCategoryName ? false : true}
-            onClick={() => handleGenerateSlug(watchCategoryName)}
-          >
-            Generate slug
-          </ButtonStyle>
         </Box>
 
-        <Box>
-          <TypographyStyle
-            component='label'
-            variant='h5'
-            htmlFor='categorySlug'
-          >
-            Category image
-          </TypographyStyle>
-
-          <DropzoneStyle
-            control={control}
-            name='categoryImage'
-            multiple={true}
-          />
-        </Box>
-      </Box>
-      <ButtonStyle
-        variant='contained'
-        size='large'
-        sx={{ mt: 4 }}
-        onClick={() => onSubmit()}
-      >
-        Create category
-      </ButtonStyle>
-    </div>
+        <ButtonStyle
+          variant='contained'
+          size='large'
+          sx={{ mt: 4 }}
+          onClick={() => onSubmit()}
+        >
+          Create category
+        </ButtonStyle>
+      </Paper>
+    </Box>
   );
 }
 
