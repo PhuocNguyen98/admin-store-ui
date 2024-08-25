@@ -13,6 +13,7 @@ import { convertSlug } from '~/utils/convertSlug';
 import DropzoneStyle from '~/components/DropzoneStyle';
 import TextFieldStyle from '~/components/FormStye/TextFieldStyle';
 import TypographyStyle from '~/components/FormStye/TypographyStyle';
+import ButtonStyle from '~/components/ButtonStyle';
 
 const schemaCategory = yup.object().shape({
   categoryName: yup.string().required('Vui lòng nhập tên danh mục'),
@@ -116,7 +117,7 @@ function CategoryForm() {
               placeholder='Category slug'
             />
           </Box>
-          <Button
+          <ButtonStyle
             sx={{ ml: 1 }}
             variant='contained'
             color='primary'
@@ -125,7 +126,7 @@ function CategoryForm() {
             onClick={() => handleGenerateSlug(watchCategoryName)}
           >
             Generate slug
-          </Button>
+          </ButtonStyle>
         </Box>
 
         <Box>
@@ -144,14 +145,14 @@ function CategoryForm() {
           />
         </Box>
       </Box>
-      <Button
+      <ButtonStyle
         variant='contained'
         size='large'
-        sx={{ mt: 3 }}
+        sx={{ mt: 4 }}
         onClick={() => onSubmit()}
       >
         Create category
-      </Button>
+      </ButtonStyle>
     </div>
   );
 }
