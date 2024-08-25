@@ -1,17 +1,18 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
-import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
 import { convertSlug } from '~/utils/convertSlug';
 import DropzoneStyle from '~/components/DropzoneStyle';
+import TextFieldStyle from '~/components/FormStye/TextFieldStyle';
+import TypographyStyle from '~/components/FormStye/TypographyStyle';
 
 const schemaCategory = yup.object().shape({
   categoryName: yup.string().required('Vui lòng nhập tên danh mục'),
@@ -70,33 +71,25 @@ function CategoryForm() {
           Create new category for the system
         </Typography>
       </Box>
+
       <Divider />
+
       <Box width='50%' mt={3} component='form' action='POST'>
-        <Controller
-          control={control}
-          name='categoryName'
-          render={({ field: { onChange, value }, fieldState: { error } }) => (
-            <Box mb={3}>
-              <Typography
-                component='label'
-                htmlFor='categoryName'
-                variant='h5'
-                sx={{ display: 'inline-block', mb: 1 }}
-              >
-                Category name <span className='asterisk'>*</span>
-              </Typography>
-              <TextField
-                fullWidth
-                id='categoryName'
-                placeholder='Category name'
-                value={value}
-                onChange={onChange}
-                error={error ? true : false}
-                helperText={error?.message ? error.message : ''}
-              />
-            </Box>
-          )}
-        />
+        <Box mb={3}>
+          <TypographyStyle
+            component='label'
+            htmlFor='categoryName'
+            variant='h5'
+            isRequired={true}
+          >
+            Category name
+          </TypographyStyle>
+          <TextFieldStyle
+            control={control}
+            name='categoryName'
+            placeholder='Category name'
+          />
+        </Box>
 
         <Box
           sx={{
@@ -105,33 +98,24 @@ function CategoryForm() {
             justifyContent: 'space-between',
           }}
         >
-          <Controller
-            control={control}
-            name='categorySlug'
-            render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <Box mb={3} flex={1}>
-                <Typography
-                  component='label'
-                  variant='h5'
-                  htmlFor='categorySlug'
-                  sx={{ display: 'inline-block', mb: 1 }}
-                >
-                  Category slug <span className='asterisk'>*</span>
-                </Typography>
-                <TextField
-                  fullWidth
-                  id='categorySlug'
-                  placeholder='Category slug'
-                  readOnly={true}
-                  disabled={true}
-                  value={value}
-                  onChange={onChange}
-                  error={error ? true : false}
-                  helperText={error?.message ? error.message : ''}
-                />
-              </Box>
-            )}
-          />
+          <Box mb={3} flex={1}>
+            <TypographyStyle
+              component='label'
+              variant='h5'
+              htmlFor='categorySlug'
+              isRequired={true}
+              comment='Nhấn nút Generate để tạo Slug'
+            >
+              Category slug
+            </TypographyStyle>
+
+            <TextFieldStyle
+              control={control}
+              name='categorySlug'
+              disabled={true}
+              placeholder='Category slug'
+            />
+          </Box>
           <Button
             sx={{ ml: 1 }}
             variant='contained'
@@ -145,14 +129,14 @@ function CategoryForm() {
         </Box>
 
         <Box>
-          <Typography
+          <TypographyStyle
             component='label'
             variant='h5'
             htmlFor='categorySlug'
-            sx={{ display: 'inline-block', mb: 1 }}
           >
             Category image
-          </Typography>
+          </TypographyStyle>
+
           <DropzoneStyle
             control={control}
             name='categoryImage'
