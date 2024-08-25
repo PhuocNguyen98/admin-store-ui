@@ -20,8 +20,7 @@ function DropzoneStyle({
   const [files, setFiles] = useState([]);
 
   const onDrop = useCallback((acceptedFiles) => {
-    field.onChange(acceptedFiles);
-    setFiles(acceptedFiles);
+    setFiles((prevFiles) => [...prevFiles, ...acceptedFiles]);
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -33,9 +32,10 @@ function DropzoneStyle({
   });
 
   useEffect(() => {
+    field.onChange(files);
     // Make sure to revoke the data uris to avoid memory leaks, will run on unmount
     return () => files.forEach((file) => URL.revokeObjectURL(file));
-  }, []);
+  }, [files]);
 
   const removeThumb = (file) => {
     setFiles((prevFiles) =>
