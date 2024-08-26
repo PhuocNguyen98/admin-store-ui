@@ -6,6 +6,8 @@ import DefaultLayout from '~/layouts';
 import Login from './pages/Auth/Login';
 import useToken from './hooks/useToken';
 
+import 'react-toastify/dist/ReactToastify.css';
+
 function App() {
   const { token, setToken } = useToken();
 
@@ -19,7 +21,7 @@ function App() {
 
   return (
     <Router>
-      <div className="app">
+      <div className='app'>
         <Routes>
           {privateRoutes.map((route, index) => {
             let Layout = DefaultLayout;

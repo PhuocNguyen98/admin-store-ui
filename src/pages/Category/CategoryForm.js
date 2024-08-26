@@ -13,7 +13,8 @@ import TextFieldStyle from '~/components/FormStye/TextFieldStyle';
 import TypographyStyle from '~/components/FormStye/TypographyStyle';
 import ButtonStyle from '~/components/ButtonStyle';
 import BreadcrumbStyle from '~/components/BreadcrumbStyle';
-import { addCategory } from '~/api/categoryApi';
+import { addCategoryApi } from '~/api/categoryApi';
+import { toast, ToastContainer } from 'react-toastify';
 
 const schemaCategory = yup.object().shape({
   categoryName: yup.string().required('Vui lòng nhập tên danh mục'),
@@ -52,21 +53,22 @@ function CategoryForm() {
       formData.append('categoryImage', []);
     }
     try {
-      const res = await addCategory(formData);
+      const res = await addCategoryApi(formData);
       if (res) {
-        alert(res);
+        toast.success(res);
         setFiles([]);
         setValue('categoryName', '');
         setValue('categorySlug', '');
         setValue('categoryImage', files);
       }
     } catch (error) {
-      alert(error);
+      toast.error(error.message);
     }
   });
 
   return (
     <Box>
+      <ToastContainer />
       <Box>
         <BreadcrumbStyle />
 
