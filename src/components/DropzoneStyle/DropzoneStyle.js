@@ -1,6 +1,6 @@
 import { useDropzone } from 'react-dropzone';
 import { useController } from 'react-hook-form';
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import classnames from 'classnames/bind';
 import styles from './DropzoneStyle.module.scss';
 
@@ -14,10 +14,11 @@ function DropzoneStyle({
   },
   multiple = false,
   maxSize = 5242880, // 5MB
+  files,
+  setFiles,
   ...props
 }) {
   const { field } = useController({ control, name });
-  const [files, setFiles] = useState([]);
 
   const onDrop = useCallback((acceptedFiles) => {
     setFiles((prevFiles) => [...prevFiles, ...acceptedFiles]);

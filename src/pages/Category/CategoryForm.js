@@ -3,6 +3,7 @@ import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import Paper from '@mui/material/Paper';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -12,6 +13,7 @@ import TextFieldStyle from '~/components/FormStye/TextFieldStyle';
 import TypographyStyle from '~/components/FormStye/TypographyStyle';
 import ButtonStyle from '~/components/ButtonStyle';
 import BreadcrumbStyle from '~/components/BreadcrumbStyle';
+import { addCategory } from '~/api/categoryApi';
 
 const schemaCategory = yup.object().shape({
   categoryName: yup.string().required('Vui lòng nhập tên danh mục'),
@@ -20,6 +22,7 @@ const schemaCategory = yup.object().shape({
 });
 
 function CategoryForm() {
+  const [files, setFiles] = useState([]);
   const { handleSubmit, control, watch, setValue, clearErrors } = useForm({
     defaultValues: {
       categoryName: '',
@@ -40,14 +43,29 @@ function CategoryForm() {
   };
 
   const onSubmit = handleSubmit(async (data) => {
-    console.log(data);
+    const formData = new FormData();
+    formData.append('categoryName', data.categoryName);
+    formData.append('categorySlug', data.categorySlug);
+    formData.append('categoryImage', data.categoryImage[0]);
+    try {
+      const res = await addCategory(formData);
+      if (res) {
+        alert(res);
+        setFiles([]);
+        setValue('categoryName', '');
+        setValue('categorySlug', '');
+        setValue('categoryImage', files);
+      }
+    } catch (error) {
+      alert(error);
+    }
   });
 
   return (
     <Box>
       <Box>
         <BreadcrumbStyle />
-        
+
         <Typography
           variant='h3'
           component='h4'
@@ -141,7 +159,9 @@ function CategoryForm() {
             <DropzoneStyle
               control={control}
               name='categoryImage'
-              multiple={false}
+              multiple={true}
+              files={files}
+              setFiles={setFiles}
             />
           </Box>
         </Box>
