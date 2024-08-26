@@ -1,4 +1,10 @@
-import { TableBody, TableRow, TableCell, Button } from '@mui/material';
+import {
+  TableBody,
+  TableRow,
+  TableCell,
+  Button,
+  imageListClasses,
+} from '@mui/material';
 import { Link } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
@@ -30,8 +36,25 @@ const theme = createTheme({
 function TableBodyStyle({ columns, tableData, actions }) {
   const renderTableBody = () =>
     tableData.map((data, index) => (
-      <TableRow key={index}>
+      <TableRow key={data.id}>
         {columns.map((col) => {
+          if (col.accessor === 'thumbnail') {
+            return (
+              <TableCell key={col.accessor}>
+                <img
+                  src={`${process.env.REACT_APP_BASE_URL}/${
+                    data[col.accessor]
+                  }`}
+                  alt=''
+                  style={{
+                    width: '100px',
+                    height: '100px',
+                    objectFit: 'cover',
+                  }}
+                />
+              </TableCell>
+            );
+          }
           if (col.accessor === 'actions') {
             return (
               <TableCell key={col.accessor}>

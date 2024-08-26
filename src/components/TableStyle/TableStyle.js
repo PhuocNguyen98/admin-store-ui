@@ -4,11 +4,12 @@ import TableContainer from '@mui/material/TableContainer';
 import Paper from '@mui/material/Paper';
 
 import { Box, TextField, TablePagination } from '@mui/material';
-import { useState } from 'react';
 
 import TableHeadStyle from './TableHeadStyle';
 import TableBodyStyle from './TableBodyStyle';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+
+import useSortableTable from '~/hooks/useSortableTable';
 
 const theme = createTheme({
   components: {
@@ -25,33 +26,8 @@ const theme = createTheme({
   },
 });
 
-const getDefaultSorting = (defaultTableData, columns) => {
-  const sorted = [...defaultTableData].sort((a, b) => {
-    const filterColumn = columns.filter((column) => column.sortbyOrder);
-
-    // Merge all array objects into single object and extract accessor and sortbyOrder keys
-    let { accessor = 'id', sortbyOrder = 'asc' } = Object.assign(
-      {},
-      ...filterColumn,
-    );
-
-    if (a[accessor] === null) return 1;
-    if (b[accessor] === null) return -1;
-    if (a[accessor] === null && b[accessor] === null) return 0;
-
-    const ascending = a[accessor]
-      .toString()
-      .localeCompare(b[accessor].toString(), 'en', {
-        numeric: true,
-      });
-    return sortbyOrder === 'asc' ? ascending : -ascending;
-  });
-  return sorted;
-};
-
 function TableStyle({ titleInputSearch, columns, data, actions }) {
-  const [tableData, setTableData] = useState(getDefaultSorting(data, columns));
-
+  const [tableData, handleSorting] = useSortableTable(data, columns);
   // const [search, setSearch] = useState('');
 
   // const [page, setPage] = useState(2);
@@ -66,22 +42,6 @@ function TableStyle({ titleInputSearch, columns, data, actions }) {
   //   setPage(0);
   // };
 
-  const handleSorting = (sortField, sortOrder) => {
-    if (sortField) {
-      const sorted = [...tableData].sort((a, b) => {
-        if (a[sortField] === null) return 1;
-        if (b[sortField] === null) return -1;
-        if (a[sortField] === null && b[sortField] === null) return 0;
-        return (
-          a[sortField].toString().localeCompare(b[sortField].toString(), 'en', {
-            numeric: true,
-          }) * (sortOrder === 'asc' ? 1 : -1)
-        );
-      });
-      setTableData(sorted);
-    }
-  };
-
   return (
     <ThemeProvider theme={theme}>
       <Box>
@@ -94,7 +54,7 @@ function TableStyle({ titleInputSearch, columns, data, actions }) {
             }}
           />
         </Box>
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} elevation={4}>
           <Table sx={{ minWidth: 650 }} aria-label='simple table'>
             <TableHeadStyle
               columns={columns}

@@ -42,7 +42,6 @@ const sortByOrder = (columns) => {
     sortbyOrder,
   };
 };
-
 function TableHeadStyle({ columns, handleSorting }) {
   const [sortField, setSortField] = useState(sortByOrder(columns).accessor);
   const [order, setOrder] = useState(sortByOrder(columns).sortbyOrder);

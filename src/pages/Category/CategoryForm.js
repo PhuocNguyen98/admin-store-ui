@@ -165,7 +165,7 @@ function CategoryForm() {
             <DropzoneStyle
               control={control}
               name='categoryImage'
-              multiple={true}
+              multiple={false}
               files={files}
               setFiles={setFiles}
             />

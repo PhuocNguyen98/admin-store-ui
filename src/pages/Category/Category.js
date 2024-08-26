@@ -13,88 +13,14 @@ import { Link } from 'react-router-dom';
 import TableStyle from '~/components/TableStyle';
 import config from '~/config';
 
-const DATA_CATEGORY = [
-  {
-    id: 1,
-    full_name: 'Nguyễn Hữu Phước',
-    email: 'bt.phuocnguyen@gmail.com',
-    gender: 'Female',
-    age: 26,
-    start_date: '2022-01-20',
-  },
-  {
-    id: 2,
-    full_name: 'Lê Thị B',
-    email: 'lethi@gmail.com',
-    gender: 'Male',
-    age: 30,
-    start_date: '2022-09-18',
-  },
-  {
-    id: 3,
-    full_name: 'Huỳnh Văn C',
-    email: 'huynhvan@gmail.com',
-    gender: 'Female',
-    age: 22,
-    start_date: '2021-10-05',
-  },
-  {
-    id: 4,
-    full_name: 'Nguyễn Hữu Phước',
-    email: 'bt.phuocnguyen@gmail.com',
-    gender: 'Female',
-    age: 26,
-    start_date: '2022-01-20',
-  },
-  {
-    id: 5,
-    full_name: 'Lê Thị B',
-    email: 'lethi@gmail.com',
-    gender: 'Male',
-    age: 30,
-    start_date: '2022-09-18',
-  },
-  {
-    id: 6,
-    full_name: 'Huỳnh Văn C',
-    email: 'huynhvan@gmail.com',
-    gender: 'Female',
-    age: 22,
-    start_date: '2021-10-05',
-  },
-  {
-    id: 7,
-    full_name: 'Nguyễn Hữu Phước',
-    email: 'bt.phuocnguyen@gmail.com',
-    gender: 'Female',
-    age: 26,
-    start_date: '2022-01-20',
-  },
-  {
-    id: 8,
-    full_name: 'Lê Thị B',
-    email: 'lethi@gmail.com',
-    gender: 'Male',
-    age: 30,
-    start_date: '2022-09-18',
-  },
-  {
-    id: 9,
-    full_name: 'Huỳnh Văn C',
-    email: 'huynhvan@gmail.com',
-    gender: 'Female',
-    age: 22,
-    start_date: '2021-10-05',
-  },
-];
+import { useState, useEffect } from 'react';
+import { getCategoryApi } from '~/api/categoryApi';
 
 const columns = [
-  { label: 'ID', accessor: 'id', sortTable: true, sortbyOrder: 'asc' }, // sortbyOrder => cột được chỉ định sắp xếp trong lần đầu
-  { label: 'Full Name', accessor: 'full_name', sortTable: true },
-  { label: 'Email', accessor: 'email', sortTable: true },
-  { label: 'Gender', accessor: 'gender', sortTable: false },
-  { label: 'Age', accessor: 'age', sortTable: true },
-  { label: 'Start date', accessor: 'start_date', sortTable: false },
+  { label: 'ID', accessor: 'id', sortTable: true, sortbyOrder: 'desc' }, // sortbyOrder => cột được chỉ định sắp xếp trong lần đầu
+  { label: 'Name', accessor: 'name', sortTable: true },
+  { label: 'Thumbnail', accessor: 'thumbnail', sortTable: true },
+  { label: 'Slug', accessor: 'slug', sortTable: true },
   { label: 'Actions', accessor: 'actions' },
 ];
 
@@ -118,6 +44,19 @@ const actions = [
 ];
 
 function Category() {
+  const [data, setData] = useState(null);
+
+  const getData = async () => {
+    const res = await getCategoryApi();
+    if (res) {
+      setData(res.data);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+
   return (
     <div className='wrapper'>
       <Box
@@ -171,11 +110,11 @@ function Category() {
           marginTop: 3,
         }}
       >
-        {DATA_CATEGORY ? (
+        {data ? (
           <TableStyle
             titleInputSearch='Search by category name'
             columns={columns}
-            data={DATA_CATEGORY}
+            data={data}
             actions={actions}
           />
         ) : (
