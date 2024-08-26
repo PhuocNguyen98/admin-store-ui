@@ -46,7 +46,11 @@ function CategoryForm() {
     const formData = new FormData();
     formData.append('categoryName', data.categoryName);
     formData.append('categorySlug', data.categorySlug);
-    formData.append('categoryImage', data.categoryImage[0]);
+    if (!!data.categoryImage[0]) {
+      formData.append('categoryImage', data.categoryImage[0]);
+    } else {
+      formData.append('categoryImage', []);
+    }
     try {
       const res = await addCategory(formData);
       if (res) {
