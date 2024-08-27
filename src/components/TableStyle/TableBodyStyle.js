@@ -1,13 +1,6 @@
-import {
-  TableBody,
-  TableRow,
-  TableCell,
-  Button,
-  imageListClasses,
-} from '@mui/material';
+import { TableBody, TableRow, TableCell, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-
 import classnames from 'classnames/bind';
 import styles from './TableStyle.module.scss';
 
@@ -86,7 +79,17 @@ function TableBodyStyle({ columns, tableData, actions }) {
 
   return (
     <ThemeProvider theme={theme}>
-      <TableBody>{renderTableBody()}</TableBody>
+      <TableBody>
+        {tableData.length > 0 ? (
+          renderTableBody()
+        ) : (
+          <TableRow>
+            <TableCell colSpan={5} sx={{ textAlign: 'center' }}>
+              No records found
+            </TableCell>
+          </TableRow>
+        )}
+      </TableBody>
     </ThemeProvider>
   );
 }

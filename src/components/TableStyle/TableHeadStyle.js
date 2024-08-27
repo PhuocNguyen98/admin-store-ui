@@ -5,9 +5,8 @@ import {
   TableSortLabel,
   Box,
 } from '@mui/material';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { visuallyHidden } from '@mui/utils';
-
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
@@ -31,20 +30,9 @@ const theme = createTheme({
   },
 });
 
-const sortByOrder = (columns) => {
-  const filterColumn = columns.filter((column) => column.sortbyOrder);
-  let { accessor = '', sortbyOrder = 'asc' } = Object.assign(
-    {},
-    ...filterColumn,
-  );
-  return {
-    accessor,
-    sortbyOrder,
-  };
-};
 function TableHeadStyle({ columns, handleSorting }) {
-  const [sortField, setSortField] = useState(sortByOrder(columns).accessor);
-  const [order, setOrder] = useState(sortByOrder(columns).sortbyOrder);
+  const [sortField, setSortField] = useState('');
+  const [order, setOrder] = useState('asc');
 
   const handleSortingChange = (accessor) => {
     const sortOrder =
@@ -98,4 +86,4 @@ function TableHeadStyle({ columns, handleSorting }) {
   );
 }
 
-export default TableHeadStyle;
+export default memo(TableHeadStyle);
