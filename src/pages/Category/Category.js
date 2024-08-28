@@ -2,26 +2,21 @@ import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import FormControl from '@mui/material/FormControl';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputAdornment from '@mui/material/InputAdornment';
 
 import EditIcon from '@mui/icons-material/Edit';
-import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
-import RotateLeftIcon from '@mui/icons-material/RotateLeft';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
 
 import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import config from '~/config';
 import useDebounce from '~/hooks/useDebounce';
 import useSortTable from '~/hooks/useSortTable';
 import usePagination from '~/hooks/usePagination';
 
+import Search from '~/components/Search';
 import TableStyle from '~/components/TableStyle';
 import TableHeadStyle from '~/components/TableStyle/TableHeadStyle';
 import TableBodyStyle from '~/components/TableStyle/TableBodyStyle';
@@ -72,19 +67,7 @@ function Category() {
   );
 
   const [searchValue, setSearchValue] = useState('');
-  const [showIconSearch, setShowIconSearch] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const debounceValue = useDebounce(searchValue, 500);
-
-  const handleChangeInput = (e) => {
-    const searchValue = e.target.value;
-    setShowIconSearch(true);
-    setIsLoading(true);
-    if (!searchValue.startsWith(' ')) {
-      setSearchValue(searchValue);
-      setPage(0);
-    }
-  };
 
   const handleChangePage = (newPage, rowsPerPage) => {
     setPage(newPage);
@@ -102,7 +85,6 @@ function Category() {
     if (res) {
       setData(res.data);
       setPagination(res.pagination);
-      setIsLoading(false);
     }
   };
 
@@ -113,13 +95,6 @@ function Category() {
     getData(sortField, sortOrder, page, rowsPerPage, debounceValue);
   };
 
-  const handleClearSearch = () => {
-    setSearchValue('');
-    setPage(0);
-    setIsLoading(false);
-    setShowIconSearch(false);
-  };
-
   useEffect(() => {
     if (data.length === 0 && !debounceValue.trim()) {
       getData(sortField, order, page, rowsPerPage);
@@ -127,6 +102,13 @@ function Category() {
       getData(sortField, order, 0, rowsPerPage, searchValue);
     }
   }, [debounceValue]);
+
+  const handleSearch = useCallback(
+    (value) => {
+      setSearchValue(value);
+    },
+    [searchValue],
+  );
 
   return (
     <div className='wrapper'>
@@ -182,23 +164,7 @@ function Category() {
           marginTop: 3,
         }}
       >
-        <FormControl sx={{ mb: 3, width: '25%' }} variant='standard'>
-          <OutlinedInput
-            placeholder='Search category name'
-            sx={{ fontSize: '1.6rem' }}
-            endAdornment={
-              <InputAdornment position='end'>
-                {showIconSearch ? (
-                  <IconButton edge='end' onClick={() => handleClearSearch()}>
-                    {isLoading ? <RotateLeftIcon /> : <CloseIcon />}
-                  </IconButton>
-                ) : null}
-              </InputAdornment>
-            }
-            value={searchValue}
-            onChange={(e) => handleChangeInput(e)}
-          />
-        </FormControl>
+        <Search label='Search category test' handleSearch={handleSearch} />
 
         <TableStyle>
           <TableHeadStyle
