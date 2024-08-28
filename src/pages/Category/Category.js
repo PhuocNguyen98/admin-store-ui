@@ -177,14 +177,15 @@ function Category() {
             actions={actions}
           ></TableBodyStyle>
         </TableStyle>
-
-        <TablePaginationStyle
-          rowsPerPageValue={pagination.rowsPerPage}
-          totalRowsValue={pagination.totalRows}
-          rowsPerPageOptions={[5, 10, 15]}
-          handleChangePage={handleChangePage}
-          handleChangeRowsPerPage={handleChangeRowsPerPage}
-        />
+        {data.length > 0 ? (
+          <TablePaginationStyle
+            rowsPerPageValue={pagination.rowsPerPage}
+            totalRowsValue={pagination.totalRows}
+            rowsPerPageOptions={[5, 10, 15]}
+            handleChangePage={handleChangePage}
+            handleChangeRowsPerPage={handleChangeRowsPerPage}
+          />
+        ) : null}
       </Paper>
     </div>
   );

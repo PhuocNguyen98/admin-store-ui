@@ -80,7 +80,7 @@ function TablePaginationStyle({
     if (rowsPerPageValue) {
       setRowsPerPage(rowsPerPageValue);
     }
-  }, [totalRowsValue, rowsPerPageValue]);
+  }, []);
 
   return (
     <ThemeProvider theme={themeTablePagination}>
