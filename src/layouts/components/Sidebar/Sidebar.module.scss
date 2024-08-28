@@ -2,4 +2,10 @@
   width: var(--width-nav);
   height: 100vh;
   background-color: var(--bg-color-nav);
+  margin-top: var(--height-header);
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
 }

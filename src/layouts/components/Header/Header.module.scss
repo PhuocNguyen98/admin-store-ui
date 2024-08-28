@@ -3,6 +3,11 @@
   background-color: var(--white-color);
   display: flex;
   box-shadow: 0 4px 8px 0 #ccc;
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 10;
 }
 
 .logo {
