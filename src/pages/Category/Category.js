@@ -1,25 +1,38 @@
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
-import TablePagination from '@mui/material/TablePagination';
-import ControlPointIcon from '@mui/icons-material/ControlPoint';
-import DeleteIcon from '@mui/icons-material/Delete';
+import Button from '@mui/material/Button';
+import Divider from '@mui/material/Divider';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import FormControl from '@mui/material/FormControl';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputAdornment from '@mui/material/InputAdornment';
+
 import EditIcon from '@mui/icons-material/Edit';
+import CloseIcon from '@mui/icons-material/Close';
+import DeleteIcon from '@mui/icons-material/Delete';
+import RotateLeftIcon from '@mui/icons-material/RotateLeft';
+import ControlPointIcon from '@mui/icons-material/ControlPoint';
+
 import { Link } from 'react-router-dom';
-import { useState, useEffect, useCallback } from 'react';
-import { getCategoryApi } from '~/api/categoryApi';
+import { useState, useEffect } from 'react';
 
 import config from '~/config';
+import useDebounce from '~/hooks/useDebounce';
+import useSortTable from '~/hooks/useSortTable';
+import usePagination from '~/hooks/usePagination';
+
 import TableStyle from '~/components/TableStyle';
 import TableHeadStyle from '~/components/TableStyle/TableHeadStyle';
 import TableBodyStyle from '~/components/TableStyle/TableBodyStyle';
+import TablePaginationStyle from '~/components/TableStyle/TablePaginationStyle';
+
+import { getCategoryApi } from '~/api/categoryApi';
 
 const columns = [
   { label: 'ID', accessor: 'id', sortTable: true },
   { label: 'Name', accessor: 'name', sortTable: true },
-  { label: 'Thumbnail', accessor: 'thumbnail', sortTable: true },
+  { label: 'Thumbnail', accessor: 'thumbnail' },
   { label: 'Slug', accessor: 'slug', sortTable: true },
   { label: 'Actions', accessor: 'actions' },
 ];
@@ -45,48 +58,75 @@ const actions = [
 
 function Category() {
   const [data, setData] = useState([]);
-  const [sortField, setSortField] = useState('id');
-  const [order, setOrder] = useState('asc');
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(2);
-  const [totalRows, settotalRows] = useState(1);
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-    getData(sortField, order, newPage, rowsPerPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    let newRowsPerPage = parseInt(event.target.value, 10);
-    setRowsPerPage(newRowsPerPage);
-    setPage(0);
-    getData(sortField, order, 0, parseInt(event.target.value, 10));
-  };
-
-  const getData = async (order, sort, page, rowsPerPage) => {
-    page++;
-    const res = await getCategoryApi(order, sort, page, rowsPerPage);
-    if (res) {
-      setData(res.data);
-      settotalRows(res.pagination.totalRows);
-      setRowsPerPage(res.pagination.pageSize);
-    }
-  };
-
-  const handleSorting = useCallback(
-    (sortField, sortOrder) => {
-      setSortField(sortField);
-      setOrder(sortOrder);
-      getData(sortField, sortOrder, page, rowsPerPage);
-    },
-    [sortField, order],
+  const { sortField, order, setSortField, setOrder } = useSortTable(
+    'id',
+    'asc',
   );
 
-  useEffect(() => {
-    if (data.length === 0) {
-      getData(sortField, order, page, rowsPerPage);
+  const [pagination, setPagination] = useState({});
+  const { page, rowsPerPage, setPage, setRowsPerPage } = usePagination(
+    0,
+    5,
+    -1,
+  );
+
+  const [searchValue, setSearchValue] = useState('');
+  const [showIconSearch, setShowIconSearch] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const debounceValue = useDebounce(searchValue, 500);
+
+  const handleChangeInput = (e) => {
+    const searchValue = e.target.value;
+    setShowIconSearch(true);
+    setIsLoading(true);
+    if (!searchValue.startsWith(' ')) {
+      setSearchValue(searchValue);
+      setPage(0);
     }
-  }, []);
+  };
+
+  const handleChangePage = (newPage, rowsPerPage) => {
+    setPage(newPage);
+    getData(sortField, order, newPage, rowsPerPage, debounceValue);
+  };
+
+  const handleChangeRowsPerPage = (newPage, newRowsPerPage) => {
+    setRowsPerPage(newRowsPerPage);
+    getData(sortField, order, newPage, newRowsPerPage, debounceValue);
+  };
+
+  const getData = async (order, sort, page, rowsPerPage, search) => {
+    page++;
+    const res = await getCategoryApi(order, sort, page, rowsPerPage, search);
+    if (res) {
+      setData(res.data);
+      setPagination(res.pagination);
+      setIsLoading(false);
+    }
+  };
+
+  const handleSorting = (sortField, sortOrder) => {
+    setSortField(sortField);
+    setOrder(sortOrder);
+    setPage(0);
+    getData(sortField, sortOrder, page, rowsPerPage, debounceValue);
+  };
+
+  const handleClearSearch = () => {
+    setSearchValue('');
+    setPage(0);
+    setIsLoading(false);
+    setShowIconSearch(false);
+  };
+
+  useEffect(() => {
+    if (data.length === 0 && !debounceValue.trim()) {
+      getData(sortField, order, page, rowsPerPage);
+    } else {
+      getData(sortField, order, 0, rowsPerPage, searchValue);
+    }
+  }, [debounceValue]);
 
   return (
     <div className='wrapper'>
@@ -133,6 +173,7 @@ function Category() {
         </Link>
       </Box>
       <Divider />
+
       <Paper
         sx={{
           backgroundColor: '#fff',
@@ -141,6 +182,24 @@ function Category() {
           marginTop: 3,
         }}
       >
+        <FormControl sx={{ mb: 3, width: '25%' }} variant='standard'>
+          <OutlinedInput
+            placeholder='Search category name'
+            sx={{ fontSize: '1.6rem' }}
+            endAdornment={
+              <InputAdornment position='end'>
+                {showIconSearch ? (
+                  <IconButton edge='end' onClick={() => handleClearSearch()}>
+                    {isLoading ? <RotateLeftIcon /> : <CloseIcon />}
+                  </IconButton>
+                ) : null}
+              </InputAdornment>
+            }
+            value={searchValue}
+            onChange={(e) => handleChangeInput(e)}
+          />
+        </FormControl>
+
         <TableStyle>
           <TableHeadStyle
             columns={columns}
@@ -152,14 +211,13 @@ function Category() {
             actions={actions}
           ></TableBodyStyle>
         </TableStyle>
-        <TablePagination
-          component='div'
-          rowsPerPageOptions={[2, 4, 6, 8]}
-          rowsPerPage={rowsPerPage}
-          count={totalRows}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
+
+        <TablePaginationStyle
+          rowsPerPageValue={pagination.rowsPerPage}
+          totalRowsValue={pagination.totalRows}
+          rowsPerPageOptions={[5, 10, 15]}
+          handleChangePage={handleChangePage}
+          handleChangeRowsPerPage={handleChangeRowsPerPage}
         />
       </Paper>
     </div>
