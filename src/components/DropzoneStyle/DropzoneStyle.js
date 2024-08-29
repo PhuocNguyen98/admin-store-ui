@@ -16,12 +16,22 @@ function DropzoneStyle({
   maxSize = 5242880, // 5MB
   files,
   setFiles,
+  actions = 'add',
   ...props
 }) {
   const { field } = useController({ control, name });
 
   const onDrop = useCallback((acceptedFiles) => {
-    setFiles((prevFiles) => [...prevFiles, ...acceptedFiles]);
+    const newAcceptedFiles = acceptedFiles.map((file) =>
+      Object.assign(file, {
+        preview: URL.createObjectURL(file),
+      }),
+    );
+    if (multiple) {
+      setFiles((prevFiles) => [...prevFiles, ...newAcceptedFiles]);
+    } else {
+      setFiles(newAcceptedFiles);
+    }
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -72,7 +82,11 @@ function DropzoneStyle({
             {files.map((file, index) => (
               <div key={index} className={cx('thumb-item')}>
                 <img
-                  src={`${URL.createObjectURL(file)}`}
+                  src={
+                    actions === 'edit'
+                      ? `${process.env.REACT_APP_BASE_URL}/${file}`
+                      : file.preview
+                  }
                   alt=''
                   className={cx('thumb-img')}
                   onLoad={() => {

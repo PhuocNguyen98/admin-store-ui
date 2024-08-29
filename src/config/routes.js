@@ -7,6 +7,7 @@ const routes = {
 
 export const category = {
   add: '/category/add',
+  edit: '/category/edit/:id',
 };
 
 export default routes;

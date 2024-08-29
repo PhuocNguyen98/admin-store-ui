@@ -1,6 +1,7 @@
-import { Link, useLocation } from 'react-router-dom';
 import classname from 'classnames/bind';
 import styles from './BreadcrumbStyle.module.scss';
+import { Link, useLocation } from 'react-router-dom';
+
 import config from '~/config';
 
 const cx = classname.bind(styles);
@@ -9,6 +10,16 @@ function BreadcrumbStyle() {
   const location = useLocation();
   const pathNames = location.pathname.split('/').filter((x) => x);
   let breadcrumbPath = '';
+
+  const checkPathName = (pathName) => {
+    let lastPath = pathName[pathName.length - 1];
+    if (!Number.isNaN(lastPath)) {
+      pathName.pop();
+    }
+    return pathName;
+  };
+
+  checkPathName(pathNames);
 
   return (
     <div className={cx('wrapper')}>
