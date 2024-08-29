@@ -1,4 +1,4 @@
-import { TableBody, TableRow, TableCell, Button } from '@mui/material';
+import { TableBody, TableRow, TableCell, Button, Chip } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import classnames from 'classnames/bind';
@@ -13,6 +13,14 @@ const theme = createTheme({
         root: {
           fontSize: '1.4rem',
           color: '#495057',
+          textAlign: 'center',
+        },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          fontSize: '1.4rem',
         },
       },
     },
@@ -44,6 +52,21 @@ function TableBodyStyle({ columns, tableData, actions }) {
                     height: '100px',
                     objectFit: 'cover',
                   }}
+                />
+              </TableCell>
+            );
+          }
+          if (col.accessor.includes('is_')) {
+            return (
+              <TableCell key={col.accessor}>
+                <Chip
+                  label={
+                    data[col.accessor]
+                      ? col.displayType[0].title
+                      : col.displayType[1].title
+                  }
+                  color={data[col.accessor] ? 'success' : 'primary'}
+                  variant='outlined'
                 />
               </TableCell>
             );

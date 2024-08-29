@@ -48,6 +48,7 @@ function TableHeadStyle({ columns, handleSorting }) {
         {columns.map((col) => {
           return (
             <TableCell
+              align='center'
               key={col.accessor}
               onClick={
                 col.sortTable ? () => handleSortingChange(col.accessor) : null

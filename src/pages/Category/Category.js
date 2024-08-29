@@ -23,12 +23,18 @@ import TableBodyStyle from '~/components/TableStyle/TableBodyStyle';
 import TablePaginationStyle from '~/components/TableStyle/TablePaginationStyle';
 
 import { getCategoryApi } from '~/api/categoryApi';
+import BreadcrumbStyle from '~/components/BreadcrumbStyle';
 
 const columns = [
-  { label: 'ID', accessor: 'id', sortTable: true },
+  { label: 'STT', accessor: 'stt' },
   { label: 'Name', accessor: 'name', sortTable: true },
   { label: 'Thumbnail', accessor: 'thumbnail' },
   { label: 'Slug', accessor: 'slug', sortTable: true },
+  {
+    label: 'Trạng thái',
+    accessor: 'is_status',
+    displayType: [{ title: 'Đang kinh doanh' }, { title: 'Ngừng kinh doanh' }],
+  },
   { label: 'Actions', accessor: 'actions' },
 ];
 
@@ -40,14 +46,6 @@ const actions = [
     css: {
       color: 'info',
     },
-  },
-  {
-    icon: <DeleteIcon />,
-    title: 'Delete',
-    css: {
-      color: 'error',
-    },
-    onClick: () => alert(1),
   },
 ];
 
@@ -112,6 +110,7 @@ function Category() {
 
   return (
     <div className='wrapper'>
+      <BreadcrumbStyle />
       <Box
         sx={{
           display: 'flex',
@@ -154,6 +153,7 @@ function Category() {
           </Button>
         </Link>
       </Box>
+
       <Divider />
 
       <Paper
@@ -164,7 +164,7 @@ function Category() {
           marginTop: 3,
         }}
       >
-        <Search label='Search category test' handleSearch={handleSearch} />
+        <Search label='Search category name' handleSearch={handleSearch} />
 
         <TableStyle>
           <TableHeadStyle
