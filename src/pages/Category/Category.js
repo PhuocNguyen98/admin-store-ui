@@ -5,7 +5,6 @@ import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 
 import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
 
 import { Link } from 'react-router-dom';

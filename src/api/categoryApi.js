@@ -18,3 +18,8 @@ export const addCategoryApi = async (data) => {
   const res = await baseApi.post('/category', data);
   return res;
 };
+
+export const updateCategoryApi = async (id, data) => {
+  const res = await baseApi.post(`/category/${id}`, data);
+  return res;
+};
