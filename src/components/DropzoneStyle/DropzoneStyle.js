@@ -1,6 +1,7 @@
 import { useDropzone } from 'react-dropzone';
-import { useController } from 'react-hook-form';
 import { useEffect, useCallback } from 'react';
+import { useController } from 'react-hook-form';
+
 import classnames from 'classnames/bind';
 import styles from './DropzoneStyle.module.scss';
 
@@ -16,7 +17,6 @@ function DropzoneStyle({
   maxSize = 5242880, // 5MB
   files,
   setFiles,
-  actions = 'add',
   ...props
 }) {
   const { field } = useController({ control, name });
@@ -55,56 +55,54 @@ function DropzoneStyle({
   };
 
   return (
-    <div className={cx('wrapper')}>
-      <section className={cx('inner')}>
-        <div {...getRootProps({ className: cx('dropzone') })}>
-          <input {...getInputProps()} />
-          {isDragActive ? (
-            <p className={cx('desc')}>Drop the files here ...</p>
-          ) : (
-            <p className={cx('desc')}>
-              Drag drop {multiple ? 'some' : '1'} files here, or click to select
-              files <br />
-              {multiple && (
-                <strong
-                  className={cx('note')}
-                  style={{ display: 'block', textAlign: 'center' }}
-                >
-                  Unlimited number of files
-                </strong>
-              )}
-            </p>
+    <>
+      <div className={cx('wrapper')}>
+        <section className={cx('inner')}>
+          <div {...getRootProps({ className: cx('dropzone') })}>
+            <input {...getInputProps()} />
+            {isDragActive ? (
+              <p className={cx('desc')}>Drop the files here ...</p>
+            ) : (
+              <p className={cx('desc')}>
+                Drag drop {multiple ? 'some' : '1'} files here, or click to
+                select files <br />
+                {multiple && (
+                  <strong
+                    className={cx('note')}
+                    style={{ display: 'block', textAlign: 'center' }}
+                  >
+                    Unlimited number of files
+                  </strong>
+                )}
+              </p>
+            )}
+          </div>
+          <h4 className={cx('title')}>Image</h4>
+          {files.length > 0 && (
+            <aside className={cx('thumbs-list')}>
+              {files.map((file, index) => (
+                <div key={index} className={cx('thumb-item')}>
+                  <img
+                    src={file.preview}
+                    alt=''
+                    className={cx('thumb-img')}
+                    onLoad={() => {
+                      URL.revokeObjectURL(file);
+                    }}
+                  />
+                  <span
+                    className={cx('thumb-detele')}
+                    onClick={() => removeThumb(file)}
+                  >
+                    &times;
+                  </span>
+                </div>
+              ))}
+            </aside>
           )}
-        </div>
-        <h4 className={cx('title')}>Image</h4>
-        {files.length > 0 && (
-          <aside className={cx('thumbs-list')}>
-            {files.map((file, index) => (
-              <div key={index} className={cx('thumb-item')}>
-                <img
-                  src={
-                    actions === 'edit'
-                      ? `${process.env.REACT_APP_BASE_URL}/${file}`
-                      : file.preview
-                  }
-                  alt=''
-                  className={cx('thumb-img')}
-                  onLoad={() => {
-                    URL.revokeObjectURL(file);
-                  }}
-                />
-                <span
-                  className={cx('thumb-detele')}
-                  onClick={() => removeThumb(file)}
-                >
-                  &times;
-                </span>
-              </div>
-            ))}
-          </aside>
-        )}
-      </section>
-    </div>
+        </section>
+      </div>
+    </>
   );
 }
 
