@@ -43,9 +43,7 @@ function TableBodyStyle({ columns, tableData, actions }) {
             return (
               <TableCell key={col.accessor}>
                 <img
-                  src={`${process.env.REACT_APP_BASE_URL}/${
-                    data[col.accessor]
-                  }`}
+                  src={`${data[col.accessor]}`}
                   alt=''
                   style={{
                     width: '100px',
