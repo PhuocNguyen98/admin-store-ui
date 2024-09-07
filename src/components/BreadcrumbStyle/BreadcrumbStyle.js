@@ -13,7 +13,7 @@ function BreadcrumbStyle() {
 
   const checkPathName = (pathName) => {
     let lastPath = pathName[pathName.length - 1];
-    if (!Number.isNaN(lastPath)) {
+    if (!isNaN(lastPath)) {
       pathName.pop();
     }
     return pathName;
