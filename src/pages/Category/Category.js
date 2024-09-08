@@ -17,13 +17,14 @@ import usePagination from '~/hooks/usePagination';
 
 import Search from '~/components/Search';
 import TableStyle from '~/components/TableStyle';
+import BreadcrumbStyle from '~/components/BreadcrumbStyle';
 import TableHeadStyle from '~/components/TableStyle/TableHeadStyle';
 import TableBodyStyle from '~/components/TableStyle/TableBodyStyle';
 import TablePaginationStyle from '~/components/TableStyle/TablePaginationStyle';
 
 import { getCategoryApi } from '~/api/categoryApi';
-import BreadcrumbStyle from '~/components/BreadcrumbStyle';
 
+// Define column table
 const columns = [
   { label: 'STT', accessor: 'stt' },
   { label: 'Name', accessor: 'name', sortTable: true },
@@ -37,6 +38,7 @@ const columns = [
   { label: 'Actions', accessor: 'actions' },
 ];
 
+// Define column action table
 const actions = [
   {
     icon: <EditIcon />,
@@ -51,11 +53,13 @@ const actions = [
 function Category() {
   const [data, setData] = useState([]);
 
+  // State sort
   const { sortField, order, setSortField, setOrder } = useSortTable(
     'id',
     'asc',
   );
 
+  // State pagination
   const [pagination, setPagination] = useState({});
   const { page, rowsPerPage, setPage, setRowsPerPage } = usePagination(
     0,
@@ -63,19 +67,23 @@ function Category() {
     -1,
   );
 
+  // State search table
   const [searchValue, setSearchValue] = useState('');
   const debounceValue = useDebounce(searchValue, 500);
 
+  // Hanle change page
   const handleChangePage = (newPage, rowsPerPage) => {
     setPage(newPage);
     getData(sortField, order, newPage, rowsPerPage, debounceValue);
   };
 
+  // Handle change rows per page
   const handleChangeRowsPerPage = (newPage, newRowsPerPage) => {
     setRowsPerPage(newRowsPerPage);
     getData(sortField, order, newPage, newRowsPerPage, debounceValue);
   };
 
+  // Get data table
   const getData = async (order, sort, page, rowsPerPage, search) => {
     page++;
     const res = await getCategoryApi(order, sort, page, rowsPerPage, search);
@@ -85,12 +93,21 @@ function Category() {
     }
   };
 
+  // Handle sorting
   const handleSorting = (sortField, sortOrder) => {
     setSortField(sortField);
     setOrder(sortOrder);
     setPage(0);
     getData(sortField, sortOrder, page, rowsPerPage, debounceValue);
   };
+
+  // Handle search
+  const handleSearch = useCallback(
+    (value) => {
+      setSearchValue(value);
+    },
+    [searchValue],
+  );
 
   useEffect(() => {
     if (data.length === 0 && !debounceValue.trim()) {
@@ -99,13 +116,6 @@ function Category() {
       getData(sortField, order, 0, rowsPerPage, searchValue);
     }
   }, [debounceValue]);
-
-  const handleSearch = useCallback(
-    (value) => {
-      setSearchValue(value);
-    },
-    [searchValue],
-  );
 
   return (
     <div className='wrapper'>
