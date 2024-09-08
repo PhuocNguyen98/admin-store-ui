@@ -83,6 +83,9 @@ function CategoryForm() {
     const formData = new FormData();
     formData.append('categoryName', data.categoryName);
     formData.append('categorySlug', data.categorySlug);
+    if (data?.categoryStatus) {
+      formData.append('categoryStatus', data.categoryStatus);
+    }
     if (!!data.categoryImage[0]) {
       formData.append('categoryImage', data.categoryImage[0]);
     } else {
@@ -97,15 +100,14 @@ function CategoryForm() {
     const formData = handleFormData(data);
     try {
       const res = await addCategoryApi(formData);
-      if (res) {
-        toast.success(res);
-        setFiles([]);
-        setValue('categoryName', '');
-        setValue('categorySlug', '');
-        setValue('categoryImage', files);
-        setIsSuccess(false);
-      }
+      toast.success(res.message);
+      setValue('categoryName', '');
+      setValue('categorySlug', '');
+      setValue('categoryImage', files);
+      setFiles([]);
+      setIsSuccess(false);
     } catch (error) {
+      setIsSuccess(false);
       toast.error(error.message);
     }
   });
@@ -119,6 +121,7 @@ function CategoryForm() {
       toast.success(res);
       setIsSuccess(false);
     } catch (error) {
+      setIsSuccess(false);
       toast.error(error.message);
     }
   });
