@@ -6,6 +6,8 @@ import TableCell from '@mui/material/TableCell';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 import { Link } from 'react-router-dom';
+
+import images from '~/assets/img';
 import classnames from 'classnames/bind';
 import styles from './TableStyle.module.scss';
 
@@ -39,6 +41,10 @@ const theme = createTheme({
   },
 });
 
+const onErrorImg = (e) => {
+  e.target.src = images.imgPlacehoder;
+};
+
 function TableBodyStyle({ columns, tableData, actions }) {
   const renderTableBody = () =>
     tableData.map((data, index) => (
@@ -55,6 +61,7 @@ function TableBodyStyle({ columns, tableData, actions }) {
                     height: '100px',
                     objectFit: 'cover',
                   }}
+                  onError={(e) => onErrorImg(e)}
                 />
               </TableCell>
             );

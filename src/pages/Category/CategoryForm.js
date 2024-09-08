@@ -25,6 +25,7 @@ import {
   updateCategoryApi,
   addCategoryApi,
 } from '~/api/categoryApi';
+import images from '~/assets/img';
 
 import classnames from 'classnames/bind';
 import styles from './Category.module.scss';
@@ -142,13 +143,17 @@ function CategoryForm() {
     }
   };
 
+  const onErrorImg = (e) => {
+    e.target.src = images.imgPlacehoder;
+  };
+
   // Render image after get data
   const renderListImage = () => {
     return (
       <ul className={cx('list-image')}>
         {filesOld.map((file, index) => (
           <li key={index} className={cx('item-img')}>
-            <img alt='' src={file} />
+            <img alt='' src={file} onError={(e) => onErrorImg(e)} />
           </li>
         ))}
       </ul>
