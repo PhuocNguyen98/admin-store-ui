@@ -1,13 +1,13 @@
-import {
-  TableHead,
-  TableRow,
-  TableCell,
-  TableSortLabel,
-  Box,
-} from '@mui/material';
-import { useState, memo } from 'react';
-import { visuallyHidden } from '@mui/utils';
+import Box from '@mui/material/Box';
+import TableRow from '@mui/material/TableRow';
+import TableHead from '@mui/material/TableHead';
+import TableCell from '@mui/material/TableCell';
+import TableSortLabel from '@mui/material/TableSortLabel';
+
+import visuallyHidden from '@mui/utils/visuallyHidden';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+
+import { useState, memo } from 'react';
 
 const theme = createTheme({
   components: {

@@ -1,6 +1,9 @@
+import Menu from '@mui/material/Menu';
 import Divider from '@mui/material/Divider';
-import { ListItemIcon, Menu, MenuItem } from '@mui/material';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
 import { styled } from '@mui/material/styles';
+
 import { Link } from 'react-router-dom';
 
 const MenuItemCustom = styled(MenuItem)(({ theme }) => ({
@@ -27,7 +30,7 @@ function MenuStyle({ items = [], anchorEl, open, onClick, onClose }) {
   return (
     <Menu
       anchorEl={anchorEl}
-      id="account-menu"
+      id='account-menu'
       open={open}
       onClose={onClick}
       onClick={onClose}

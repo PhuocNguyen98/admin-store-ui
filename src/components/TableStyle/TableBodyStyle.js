@@ -1,6 +1,11 @@
-import { TableBody, TableRow, TableCell, Button, Chip } from '@mui/material';
-import { Link } from 'react-router-dom';
+import Chip from '@mui/material/Chip';
+import Button from '@mui/material/Button';
+import TableRow from '@mui/material/TableRow';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+
+import { Link } from 'react-router-dom';
 import classnames from 'classnames/bind';
 import styles from './TableStyle.module.scss';
 

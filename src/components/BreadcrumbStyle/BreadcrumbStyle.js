@@ -1,8 +1,8 @@
-import classname from 'classnames/bind';
-import styles from './BreadcrumbStyle.module.scss';
 import { Link, useLocation } from 'react-router-dom';
 
 import config from '~/config';
+import classname from 'classnames/bind';
+import styles from './BreadcrumbStyle.module.scss';
 
 const cx = classname.bind(styles);
 

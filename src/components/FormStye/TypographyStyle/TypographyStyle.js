@@ -1,5 +1,6 @@
 import Typography from '@mui/material/Typography';
 import { ThemeProvider, createTheme } from '@mui/material';
+
 import classname from 'classnames/bind';
 import styles from './TypographyStyle.module.scss';
 

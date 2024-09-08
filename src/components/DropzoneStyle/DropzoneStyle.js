@@ -1,6 +1,7 @@
-import { useDropzone } from 'react-dropzone';
 import { useEffect, useCallback } from 'react';
 import { useController } from 'react-hook-form';
+
+import { useDropzone } from 'react-dropzone';
 
 import classnames from 'classnames/bind';
 import styles from './DropzoneStyle.module.scss';
