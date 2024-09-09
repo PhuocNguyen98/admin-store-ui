@@ -34,8 +34,8 @@ const NAV_LIST = [
       },
       {
         icon: <LayersIcon />,
-        title: 'Brands',
-        to: '/',
+        title: 'Supplier',
+        to: '/supplier',
       },
       {
         icon: <ListAltIcon />,
