@@ -26,6 +26,9 @@ function Search({ label, handleSearch }) {
 
   useEffect(() => {
     handleSearch(searchValue);
+    if (!searchValue) {
+      handleClearSearch();
+    }
   }, [searchValue]);
 
   return (
