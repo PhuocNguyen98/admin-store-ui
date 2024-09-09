@@ -119,7 +119,7 @@ function CategoryForm() {
     const formData = handleFormData(data);
     try {
       const res = await updateCategoryApi(id, formData);
-      toast.success(res);
+      toast.success(res.message);
       setIsSuccess(false);
     } catch (error) {
       setIsSuccess(false);
@@ -136,7 +136,7 @@ function CategoryForm() {
         setValue('categoryName', res.data[0].name);
         setValue('categorySlug', res.data[0].slug);
         setValue('categoryStatus', res.data[0].is_status);
-        setFilesOld([res.data[0].thumbnail]);
+        setFilesOld([res.data[0].thumbnail ?? []]);
       }
     } catch (error) {
       toast.error(error.message);
