@@ -71,7 +71,6 @@ function CKEditorStyle({ control, name, textValue, setTextValue }) {
               '|',
               'link',
               'uploadImage',
-              'ckbox',
               'insertTable',
               'blockQuote',
               'mediaEmbed',
@@ -191,7 +190,7 @@ function CKEditorStyle({ control, name, textValue, setTextValue }) {
           table: {
             contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells'],
           },
-          initialData: 'Hello from CKEditor 5!',
+          initialData: '',
         }}
       />
     </>
