@@ -4,6 +4,7 @@ const routes = {
   dashboard: '/dashboard',
   category: '/category',
   supplier: '/supplier',
+  discount: '/discount',
 };
 
 export const category = {
@@ -14,6 +15,11 @@ export const category = {
 export const supplier = {
   add: '/supplier/add',
   edit: '/supplier/edit/:id',
+};
+
+export const discount = {
+  add: '/discount/add',
+  edit: '/discount/edit/:id',
 };
 
 export default routes;

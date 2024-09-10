@@ -12,6 +12,10 @@ import CategoryForm from '~/pages/Category/CategoryForm';
 import Supplier from '~/pages/Supplier';
 import SupplierForm from '~/pages/Supplier/SupplierForm';
 
+// Discount
+import Discount from '~/pages/Discount';
+import DiscountForm from '~/pages/Discount/DiscountForm';
+
 // routes need login
 export const privateRoutes = [
   { path: config.routes.logout, component: Logout, layout: null },
@@ -25,6 +29,11 @@ export const privateRoutes = [
   { path: config.routes.supplier, component: Supplier },
   { path: config.supplier.add, component: SupplierForm },
   { path: config.supplier.edit, component: SupplierForm },
+
+  // Discount
+  { path: config.routes.discount, component: Discount },
+  { path: config.discount.add, component: DiscountForm },
+  { path: config.discount.edit, component: DiscountForm },
 ];
 
 //routes not login

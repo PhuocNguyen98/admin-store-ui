@@ -50,7 +50,7 @@ const NAV_LIST = [
       {
         icon: <DiscountIcon />,
         title: 'Discount',
-        to: '/',
+        to: '/discount',
       },
     ],
   },
