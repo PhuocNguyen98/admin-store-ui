@@ -31,15 +31,33 @@ import styles from './Discount.module.scss';
 
 import { Grid } from '@mui/material';
 import CKEditorStyle from '~/components/CKEditorStyle';
+import { InputAdornment } from '@mui/material';
+import FormControlStyle from '~/components/FormStyle/FormControlStyle';
+import OutlinedInputStyle from '~/components/FormStyle/OutlinedInputStyle';
+import DatePickerStyle from '~/components/DatePickerStyle';
+import dayjs from 'dayjs';
 
 const cx = classnames.bind(styles);
 
 const schemaDiscount = yup.object().shape({
-  discountName: yup.string().required('Vui lòng nhập tên nhà cung cấp'),
+  discountName: yup.string().required('Vui lòng nhập tên khuyến mãi'),
   discountSlug: yup.string().required('Nhấn nút Generate slug để tạo slug'),
-  discountPercent: yup.string(),
-  discountStartTime: yup.string(),
-  discountEndTime: yup.string(),
+  discountPercent: yup
+    .number()
+    .typeError('Giá trị phải là số nằm trong khoảng từ 0 đến 100')
+    .min(0, 'Giá trị phải lớn hơn hoặc bằng 0')
+    .max(100, 'Giá trị tối đa là 100')
+    .integer('Giá trị phải là 1 số nguyên'),
+  discountStartTime: yup.date().default(() => dayjs()),
+  discountEndTime: yup
+    .date()
+    .when(
+      'discountStartTime',
+      (discountStartTime, schema) =>
+        discountStartTime &&
+        schema.min(discountStartTime, 'Vui lòng kiểm tra lại ngày kết thúc'),
+    )
+    .required('Vui lòng chọn ngày kết thúc'),
   discountDescription: yup.string(),
   discountImage: yup.array(),
 });
@@ -56,9 +74,9 @@ function DiscountForm() {
     defaultValues: {
       discountName: '',
       discountSlug: '',
-      discountPercent: '',
-      discountStartTime: '',
-      discountEndTime: '',
+      discountPercent: 0,
+      discountStartTime: dayjs(),
+      discountEndTime: null,
       discountDescription: '',
       discountImage: [],
     },
@@ -197,23 +215,23 @@ function DiscountForm() {
 
       <Paper elevation={6} sx={{ p: '30px', mt: 3 }}>
         <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
-            <Box mb={3}>
-              <TypographyStyle
-                component='label'
-                htmlFor='discountName'
-                variant='h5'
-                isRequired={true}
-              >
-                Discount name
-              </TypographyStyle>
-              <TextFieldStyle
-                control={control}
-                name='discountName'
-                placeholder='Discount name'
-              />
-            </Box>
+          <Grid item xs={12} xl={6}>
+            <TypographyStyle
+              component='label'
+              htmlFor='discountName'
+              variant='h5'
+              isRequired={true}
+            >
+              Discount name
+            </TypographyStyle>
+            <TextFieldStyle
+              control={control}
+              name='discountName'
+              placeholder='Discount name'
+            />
+          </Grid>
 
+          <Grid item xs={12} xl={6}>
             <Box
               sx={{
                 display: 'flex',
@@ -221,7 +239,7 @@ function DiscountForm() {
                 justifyContent: 'space-between',
               }}
             >
-              <Box mb={3} flex={1}>
+              <Box flex={1}>
                 <TypographyStyle
                   component='label'
                   variant='h5'
@@ -231,7 +249,6 @@ function DiscountForm() {
                 >
                   Discount slug
                 </TypographyStyle>
-
                 <TextFieldStyle
                   control={control}
                   name='discountSlug'
@@ -239,8 +256,9 @@ function DiscountForm() {
                   placeholder='Discount slug'
                 />
               </Box>
+
               <ButtonStyle
-                sx={{ ml: 1 }}
+                sx={{ ml: 1, mt: 2 }}
                 variant='contained'
                 color='primary'
                 startIcon={<AutorenewIcon />}
@@ -250,90 +268,95 @@ function DiscountForm() {
                 Generate slug
               </ButtonStyle>
             </Box>
+          </Grid>
 
-            <Box mb={3}>
-              <TypographyStyle
-                component='label'
-                htmlFor='discountPercent'
-                variant='h5'
-                isRequired={true}
-                comment='Nhập % giảm giá'
-              >
-                Discount percent
-              </TypographyStyle>
-              <TextFieldStyle
+          <Grid item xs={12} xl={4}>
+            <TypographyStyle
+              component='label'
+              htmlFor='discountPercent'
+              variant='h5'
+              isRequired={true}
+              comment='Nhập % giảm giá'
+            >
+              Discount percent
+            </TypographyStyle>
+
+            <FormControlStyle fullWidth>
+              <OutlinedInputStyle
                 control={control}
                 name='discountPercent'
+                endAdornment={
+                  <InputAdornment position='start'>%</InputAdornment>
+                }
                 placeholder='Discount percent'
               />
-            </Box>
+            </FormControlStyle>
           </Grid>
 
-          <Grid item xs={12} md={6}>
-            <Box mb={3}>
-              <TypographyStyle
-                component='label'
-                htmlFor='discountStartTime'
-                variant='h5'
-                isRequired={true}
-                comment='Chọn thời gian bắt đầu áp dụng giảm giá'
-              >
-                Start time
-              </TypographyStyle>
-              <TextFieldStyle
-                control={control}
-                name='discountStartTime'
-                placeholder='Discount start time'
-              />
-            </Box>
+          <Grid item xs={12} xl={4}>
+            <TypographyStyle
+              component='label'
+              htmlFor='discountStartTime'
+              variant='h5'
+              isRequired={true}
+              comment='Chọn thời gian bắt đầu áp dụng giảm giá'
+            >
+              Start time
+            </TypographyStyle>
 
-            <Box mb={3}>
-              <TypographyStyle
-                component='label'
-                htmlFor='discountEndTime'
-                variant='h5'
-                isRequired={true}
-                comment='Chọn thời gian kết thúc áp dụng giảm giá'
-              >
-                End time
-              </TypographyStyle>
-              <TextFieldStyle
-                control={control}
-                name='discountEndTime'
-                placeholder='Discount end time'
-              />
-            </Box>
+            <DatePickerStyle control={control} name='discountStartTime' />
+          </Grid>
+
+          <Grid item xs={12} xl={4}>
+            <TypographyStyle
+              component='label'
+              htmlFor='discountEndTime'
+              variant='h5'
+              isRequired={true}
+              comment='Chọn thời gian kết thúc áp dụng giảm giá'
+            >
+              End time
+            </TypographyStyle>
+
+            <DatePickerStyle control={control} name='discountEndTime' />
           </Grid>
 
           <Grid item xs={12}>
-            <Box>
-              <TypographyStyle
-                component='label'
-                variant='h5'
-                htmlFor='discountImage'
-                comment='Không bắt buộc'
-              >
-                Discount thumbnail
-              </TypographyStyle>
+            <TypographyStyle
+              component='label'
+              variant='h5'
+              htmlFor='discountImage'
+              comment='Không bắt buộc'
+            >
+              Discount thumbnail
+            </TypographyStyle>
 
-              {data.length > 0 ? (
-                <Box display='flex' alignItems='center' flexWrap='wrap' ml={3}>
-                  <span>Thumbnail Old: </span>
-                  {filesOld.length > 0 ? renderListImage() : null}
-                </Box>
-              ) : null}
+            {data.length > 0 ? (
+              <Box display='flex' alignItems='center' flexWrap='wrap' ml={3}>
+                <span>Thumbnail Old: </span>
+                {filesOld.length > 0 ? renderListImage() : null}
+              </Box>
+            ) : null}
 
-              <DropzoneStyle
-                control={control}
-                name='discountImage'
-                multiple={false}
-                files={files}
-                setFiles={setFiles}
-              />
-            </Box>
+            <DropzoneStyle
+              control={control}
+              name='discountImage'
+              multiple={false}
+              files={files}
+              setFiles={setFiles}
+            />
           </Grid>
 
           <Grid item xs={12}>
+            <TypographyStyle
+              component='label'
+              variant='h5'
+              htmlFor='discountImage'
+              comment='Không bắt buộc'
+            >
+              Discriptions
+            </TypographyStyle>
+
             <CKEditorStyle
               control={control}
               name='discountDescription'
