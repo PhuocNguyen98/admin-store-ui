@@ -15,8 +15,8 @@ import { toast, ToastContainer } from 'react-toastify';
 import ButtonStyle from '~/components/ButtonStyle';
 import DropzoneStyle from '~/components/DropzoneStyle';
 import BreadcrumbStyle from '~/components/BreadcrumbStyle';
-import TextFieldStyle from '~/components/FormStye/TextFieldStyle';
-import TypographyStyle from '~/components/FormStye/TypographyStyle';
+import TextFieldStyle from '~/components/FormStyle/TextFieldStyle';
+import TypographyStyle from '~/components/FormStyle/TypographyStyle';
 
 import { convertSlug } from '~/utils/convertSlug';
 import {
