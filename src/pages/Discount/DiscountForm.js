@@ -68,7 +68,7 @@ function DiscountForm() {
   const [files, setFiles] = useState([]); // Save image new
   const [filesOld, setFilesOld] = useState([]); // Save image old
   const [isSuccess, setIsSuccess] = useState(false);
-  const [textValue, setTextValue] = useState('');
+  const [textValue, setTextValue] = useState(''); // Save text CKEditor
 
   const { handleSubmit, control, watch, setValue, clearErrors } = useForm({
     defaultValues: {
@@ -97,33 +97,42 @@ function DiscountForm() {
   // Handle formdata
   const handleFormData = (data) => {
     const formData = new FormData();
-    formData.append('supplierName', data.supplierName);
-    formData.append('supplierSlug', data.supplierSlug);
-    if (!!data.supplierImage[0]) {
-      formData.append('supplierImage', data.supplierImage[0]);
+    formData.append('discountName', data.discountName);
+    formData.append('discountSlug', data.discountSlug);
+    formData.append('discountPercent', data.discountPercent);
+    formData.append('discountStartTime', data.discountStartTime);
+    formData.append('discountEndTime', data.discountEndTime);
+    formData.append('discountDescription', data.discountDescription);
+    if (!!data.discountImage[0]) {
+      formData.append('discountImage', data.discountImage[0]);
     } else {
-      formData.append('supplierImage', []);
+      formData.append('discountImage', []);
     }
     return formData;
   };
 
   // Handle click add submit
   const handleAdd = handleSubmit(async (data) => {
-    console.log(data);
-    // setIsSuccess(true);
-    // const formData = handleFormData(data);
-    // try {
-    //   const res = await addDiscountApi(formData);
-    //   toast.success(res.message);
-    //   setValue('supplierName', '');
-    //   setValue('supplierSlug', '');
-    //   setValue('supplierImage', files);
-    //   setFiles([]);
-    //   setIsSuccess(false);
-    // } catch (error) {
-    //   setIsSuccess(false);
-    //   toast.error(error.message);
-    // }
+    handleFormData(data);
+    setIsSuccess(true);
+    const formData = handleFormData(data);
+    try {
+      const res = await addDiscountApi(formData);
+      toast.success(res.message);
+      setValue('discountName', '');
+      setValue('discountSlug', '');
+      setValue('discountPercent', 0);
+      setValue('discountStartTime', dayjs());
+      setValue('discountEndTime', null);
+      setValue('supplierImage', files);
+      setValue('discountDescription', '');
+      setTextValue('');
+      setFiles([]);
+      setIsSuccess(false);
+    } catch (error) {
+      setIsSuccess(false);
+      toast.error(error.message);
+    }
   });
 
   // Handle click edit submit
@@ -146,9 +155,17 @@ function DiscountForm() {
       const res = await getDiscountByIdApi(id);
       if (res) {
         setData(res.data);
-        setValue('supplierName', res.data[0].name);
-        setValue('supplierSlug', res.data[0].slug);
+        setValue('discountName', res.data[0].name);
+        setValue('discountSlug', res.data[0].slug);
+        setValue('discountPercent', res.data[0].percent);
+        setValue(
+          'discountStartTime',
+          dayjs(res.data[0].start_time, 'DD-MM-YYYY'),
+        );
+        setValue('discountEndTime', dayjs(res.data[0].end_time, 'DD-MM-YYYY'));
+        setValue('discountDescription', res.data[0].description);
         setFilesOld([res.data[0].thumbnail ?? []]);
+        setTextValue(res.data[0].description);
       }
     } catch (error) {
       toast.error(error.message);
