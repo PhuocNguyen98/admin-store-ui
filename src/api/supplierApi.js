@@ -20,6 +20,6 @@ export const addSupplierApi = async (data) => {
 };
 
 export const updateSupplierApi = async (id, data) => {
-  const res = await baseApi.post(`/supplier/${id}`, data);
+  const res = await baseApi.put(`/supplier/${id}`, data);
   return res;
 };

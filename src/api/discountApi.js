@@ -20,7 +20,7 @@ export const addDiscountApi = async (data) => {
 };
 
 export const updateDiscountApi = async (id, data) => {
-  const res = await baseApi.post(`/discount/${id}`, data);
+  const res = await baseApi.put(`/discount/${id}`, data);
   return res;
 };
 

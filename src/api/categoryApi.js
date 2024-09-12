@@ -20,6 +20,6 @@ export const addCategoryApi = async (data) => {
 };
 
 export const updateCategoryApi = async (id, data) => {
-  const res = await baseApi.post(`/category/${id}`, data);
+  const res = await baseApi.put(`/category/${id}`, data);
   return res;
 };
