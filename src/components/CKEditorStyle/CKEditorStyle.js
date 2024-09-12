@@ -118,9 +118,6 @@ function CKEditorStyle({ control, name, textValue, setTextValue }) {
             Underline,
             TodoList,
           ],
-          mention: {
-            // Mention configuration
-          },
           heading: {
             options: [
               {

@@ -211,15 +211,17 @@ function Discount() {
       >
         <Box display='flex' alignItems='center' justifyContent='space-between'>
           <Search label='Search discount name' handleSearch={handleSearch} />
-          <ToolTipStyle title='Cập nhật nhanh trạng thái'>
-            <Button
-              variant='contained'
-              sx={{ fontSize: '1.3rem' }}
-              onClick={() => onSubmit()}
-            >
-              Quick Update
-            </Button>
-          </ToolTipStyle>
+          {data.length > 0 ? (
+            <ToolTipStyle title='Cập nhật nhanh trạng thái'>
+              <Button
+                variant='contained'
+                sx={{ fontSize: '1.3rem' }}
+                onClick={() => onSubmit()}
+              >
+                Quick Update
+              </Button>
+            </ToolTipStyle>
+          ) : null}
         </Box>
 
         <TableStyle>
