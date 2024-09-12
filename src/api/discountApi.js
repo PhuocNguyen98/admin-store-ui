@@ -23,3 +23,8 @@ export const updateDiscountApi = async (id, data) => {
   const res = await baseApi.post(`/discount/${id}`, data);
   return res;
 };
+
+export const updateDiscountStatusApi = async (data) => {
+  const res = await baseApi.put(`/discount`, data);
+  return res;
+};

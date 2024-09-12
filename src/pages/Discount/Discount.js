@@ -9,6 +9,7 @@ import ControlPointIcon from '@mui/icons-material/ControlPoint';
 
 import { Link } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
+import { useForm, useFieldArray } from 'react-hook-form';
 
 import config from '~/config';
 import useDebounce from '~/hooks/useDebounce';
@@ -17,20 +18,40 @@ import usePagination from '~/hooks/usePagination';
 
 import Search from '~/components/Search';
 import TableStyle from '~/components/TableStyle';
+import ToolTipStyle from '~/components/ToolTipStyle';
 import BreadcrumbStyle from '~/components/BreadcrumbStyle';
 import TableHeadStyle from '~/components/TableStyle/TableHeadStyle';
 import TableBodyStyle from '~/components/TableStyle/TableBodyStyle';
 import TablePaginationStyle from '~/components/TableStyle/TablePaginationStyle';
 
-import { getDiscountApi } from '~/api/discountApi';
+import { toast, ToastContainer } from 'react-toastify';
+import { getDiscountApi, updateDiscountStatusApi } from '~/api/discountApi';
 
 // Define column table
 const columns = [
-  { label: 'STT', accessor: 'stt' },
-  { label: 'Name', accessor: 'name', sortTable: true },
-  { label: 'Thumbnail', accessor: 'thumbnail' },
-  { label: 'Slug', accessor: 'slug', sortTable: true },
-  { label: 'Actions', accessor: 'actions' },
+  { label: 'STT', accessor: 'stt', component: 'text' },
+  {
+    label: 'Name',
+    accessor: 'name',
+    sortTable: true,
+    component: 'text',
+  },
+  { label: 'Thumbnail', accessor: 'thumbnail', component: 'image' },
+  { label: 'Ngày bắt đầu', accessor: 'start_time', component: 'text' },
+  { label: 'Ngày kết thúc', accessor: 'end_time', component: 'text' },
+  {
+    label: 'Trạng thái',
+    accessor: 'is_status',
+    displayType: [
+      { title: 'Đang áp dụng', value: 1, color: 'success' },
+      { title: 'Chưa áp dụng', value: 0, color: 'primary' },
+    ],
+    // editTable: false,
+    // component: 'chip', // Lấy component Chip Material UI nếu editTable = false
+    editTable: true,
+    component: 'select', // Lấy component Select Material UI nếu editTable = true
+  },
+  { label: 'Actions', accessor: 'actions', component: 'actions' },
 ];
 
 // Define column action table
@@ -46,6 +67,25 @@ const actions = [
 ];
 
 function Discount() {
+  const { control, setValue, handleSubmit } = useForm({
+    defaultValues: {
+      formList: [],
+    },
+  });
+  const { fields } = useFieldArray({
+    control,
+    name: 'formList',
+  });
+
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      const res = await updateDiscountStatusApi(data);
+      toast.success(res.message);
+    } catch (error) {
+      toast.error(error.messages);
+    }
+  });
+
   const [data, setData] = useState([]);
 
   // State sort
@@ -114,6 +154,7 @@ function Discount() {
 
   return (
     <div className='wrapper'>
+      <ToastContainer />
       <BreadcrumbStyle />
       <Box
         sx={{
@@ -168,7 +209,18 @@ function Discount() {
           marginTop: 3,
         }}
       >
-        <Search label='Search discount name' handleSearch={handleSearch} />
+        <Box display='flex' alignItems='center' justifyContent='space-between'>
+          <Search label='Search discount name' handleSearch={handleSearch} />
+          <ToolTipStyle title='Cập nhật nhanh trạng thái'>
+            <Button
+              variant='contained'
+              sx={{ fontSize: '1.3rem' }}
+              onClick={() => onSubmit()}
+            >
+              Quick Update
+            </Button>
+          </ToolTipStyle>
+        </Box>
 
         <TableStyle>
           <TableHeadStyle
@@ -179,6 +231,8 @@ function Discount() {
             columns={columns}
             tableData={data}
             actions={actions}
+            control={control}
+            setValue={setValue}
           ></TableBodyStyle>
         </TableStyle>
         {data.length > 0 ? (
