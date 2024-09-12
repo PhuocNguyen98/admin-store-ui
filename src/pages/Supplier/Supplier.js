@@ -26,11 +26,11 @@ import { getSupplierApi } from '~/api/supplierApi';
 
 // Define column table
 const columns = [
-  { label: 'STT', accessor: 'stt' },
-  { label: 'Name', accessor: 'name', sortTable: true },
-  { label: 'Thumbnail', accessor: 'thumbnail' },
-  { label: 'Slug', accessor: 'slug', sortTable: true },
-  { label: 'Actions', accessor: 'actions' },
+  { label: 'STT', accessor: 'stt', component: 'text' },
+  { label: 'Name', accessor: 'name', component: 'text', sortTable: true },
+  { label: 'Thumbnail', accessor: 'thumbnail', component: 'image' },
+  { label: 'Slug', accessor: 'slug', component: 'text', sortTable: true },
+  { label: 'Actions', accessor: 'actions', component: 'actions' },
 ];
 
 // Define column action table

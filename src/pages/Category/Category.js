@@ -26,16 +26,20 @@ import { getCategoryApi } from '~/api/categoryApi';
 
 // Define column table
 const columns = [
-  { label: 'STT', accessor: 'stt' },
-  { label: 'Name', accessor: 'name', sortTable: true },
-  { label: 'Thumbnail', accessor: 'thumbnail' },
-  { label: 'Slug', accessor: 'slug', sortTable: true },
+  { label: 'STT', accessor: 'stt', component: 'text' },
+  { label: 'Name', accessor: 'name', component: 'text', sortTable: true },
+  { label: 'Thumbnail', accessor: 'thumbnail', component: 'image' },
+  { label: 'Slug', accessor: 'slug', component: 'text', sortTable: true },
   {
     label: 'Trạng thái',
     accessor: 'is_status',
-    displayType: [{ title: 'Đang kinh doanh' }, { title: 'Ngừng kinh doanh' }],
+    displayType: [
+      { title: 'Đang kinh doanh', value: 1, color: 'success' },
+      { title: 'Ngừng kinh doanh', value: 0, color: 'primary' },
+    ],
+    component: 'chip',
   },
-  { label: 'Actions', accessor: 'actions' },
+  { label: 'Actions', accessor: 'actions', component: 'actions' },
 ];
 
 // Define column action table
