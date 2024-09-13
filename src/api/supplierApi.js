@@ -1,7 +1,20 @@
 import { baseApi } from '~/utils/axios';
 
 export const getSupplierApi = async (order, sort, page, limit, search) => {
-  let url = `/supplier?order=${order}&sort=${sort}&page=${page}&limit=${limit}`;
+  let url = `/supplier`;
+
+  if (order) {
+    url += `?order=${order}`;
+  }
+  if (sort) {
+    url += `&sort=${sort}`;
+  }
+  if (page) {
+    url += `&page=${page}`;
+  }
+  if (limit) {
+    url += `&limit=${limit}`;
+  }
   if (search) {
     url += `&search=${search}`;
   }
