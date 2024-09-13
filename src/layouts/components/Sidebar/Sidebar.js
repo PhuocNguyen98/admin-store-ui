@@ -40,7 +40,7 @@ const NAV_LIST = [
       {
         icon: <ListAltIcon />,
         title: 'Product',
-        to: '/',
+        to: '/product',
       },
       {
         icon: <InventoryIcon />,

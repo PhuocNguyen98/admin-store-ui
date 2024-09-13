@@ -5,6 +5,7 @@ const routes = {
   category: '/category',
   supplier: '/supplier',
   discount: '/discount',
+  product: '/product',
 };
 
 export const category = {
@@ -20,6 +21,11 @@ export const supplier = {
 export const discount = {
   add: '/discount/add',
   edit: '/discount/edit/:id',
+};
+
+export const product = {
+  add: '/product/add',
+  edit: '/product/edit/:id',
 };
 
 export default routes;
