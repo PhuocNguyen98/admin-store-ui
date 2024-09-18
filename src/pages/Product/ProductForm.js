@@ -54,11 +54,23 @@ const schemaProduct = yup.object().shape({
     .number()
     .nullable()
     .transform((value, original) => (original === '' ? null : value)),
+  productStatus: yup.string(),
+  productDisplay: yup.string(),
   productThumbnail: yup.array(),
   productImages: yup.array(),
   productSpecifications: yup.string(),
   productDescription: yup.string(),
 });
+
+const optionStatus = [
+  { title: 'Ngừng kinh doanh', value: 0 },
+  { title: 'Đang kinh doanh', value: 1 },
+];
+
+const optionDisplay = [
+  { title: 'Không hiển thị', value: 0 },
+  { title: 'Đang hiển thị', value: 1 },
+];
 
 function ProductForm() {
   const { id } = useParams(); // Get id
@@ -84,6 +96,8 @@ function ProductForm() {
       productSupplier: '',
       productCategory: '',
       productDiscount: '',
+      productStatus: '',
+      productDisplay: '',
       productThumbnail: [],
       productImages: [],
       productSpecifications: '',
@@ -131,7 +145,7 @@ function ProductForm() {
       formData.append('productImages', []);
     }
 
-    console.log([...formData]);
+    // console.log([...formData]);
     return formData;
   };
 
@@ -167,7 +181,9 @@ function ProductForm() {
   // Handle click edit submit
   const handleEdit = handleSubmit(async (data) => {
     setIsSuccess(true);
-    const formData = handleFormData(data);
+    let formData = handleFormData(data);
+    formData.append('productStatus', data.productStatus);
+    formData.append('productDisplay', data.productDisplay);
     try {
       const res = await updateProductApi(id, formData);
       toast.success(res.message);
@@ -198,6 +214,8 @@ function ProductForm() {
         setValue('productSupplier', res.data[0].supplier_id);
         setValue('productCategory', res.data[0].category_id);
         setValue('productDiscount', res.data[0].discount_id);
+        setValue('productStatus', res.data[0].is_status);
+        setValue('productDisplay', res.data[0].is_display);
       }
     } catch (error) {
       toast.error(error.message);
@@ -424,6 +442,46 @@ function ProductForm() {
 
             <TextFieldStyle control={control} name='productInventory' />
           </Grid>
+
+          {id ? (
+            <>
+              <Grid item xs={12} xl={4}>
+                <TypographyStyle
+                  component='label'
+                  variant='h5'
+                  htmlFor='productStatus'
+                  isRequired={true}
+                >
+                  Product status
+                </TypographyStyle>
+
+                <SelectStyle
+                  control={control}
+                  name='productStatus'
+                  options={optionStatus}
+                  title='Chọn trạng thái'
+                />
+              </Grid>
+
+              <Grid item xs={12} xl={4}>
+                <TypographyStyle
+                  component='label'
+                  variant='h5'
+                  htmlFor='productDisplay'
+                  isRequired={true}
+                >
+                  Product display
+                </TypographyStyle>
+
+                <SelectStyle
+                  control={control}
+                  name='productDisplay'
+                  options={optionDisplay}
+                  title='Chọn để hiển thị hoặc ẩn sản phẩm'
+                />
+              </Grid>
+            </>
+          ) : null}
 
           <Grid item xs={12}>
             <TypographyStyle
