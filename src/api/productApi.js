@@ -23,3 +23,8 @@ export const updateProductApi = async (id, data) => {
   const res = await baseApi.put(`/product/${id}`, data);
   return res;
 };
+
+export const quickUpdateProductApi = async (data) => {
+  const res = await baseApi.put(`/product`, data);
+  return res;
+};

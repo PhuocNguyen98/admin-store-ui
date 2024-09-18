@@ -8,6 +8,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
 
 import { Link } from 'react-router-dom';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { useState, useEffect, useCallback } from 'react';
 
 import config from '~/config';
@@ -17,19 +18,49 @@ import usePagination from '~/hooks/usePagination';
 
 import Search from '~/components/Search';
 import TableStyle from '~/components/TableStyle';
+import ToolTipStyle from '~/components/ToolTipStyle';
 import BreadcrumbStyle from '~/components/BreadcrumbStyle';
 import TableHeadStyle from '~/components/TableStyle/TableHeadStyle';
 import TableBodyStyle from '~/components/TableStyle/TableBodyStyle';
 import TablePaginationStyle from '~/components/TableStyle/TablePaginationStyle';
 
-import { getProductApi } from '~/api/productApi';
+import { toast, ToastContainer } from 'react-toastify';
+import { getProductApi, quickUpdateProductApi } from '~/api/productApi';
 
 // Define column table
 const columns = [
   { label: 'STT', accessor: 'stt', component: 'text' },
   { label: 'Name', accessor: 'name', component: 'text', sortTable: true },
+  { label: 'Price', accessor: 'price', component: 'currency', sortTable: true },
+  { label: 'Supplier', accessor: 'supplier', component: 'text' },
+  { label: 'Category', accessor: 'category', component: 'text' },
+  {
+    label: 'Inventory',
+    accessor: 'inventory',
+    component: 'text',
+    sortTable: true,
+  },
   { label: 'Thumbnail', accessor: 'thumbnail', component: 'image' },
-  { label: 'Slug', accessor: 'slug', component: 'text', sortTable: true },
+  {
+    label: 'Display',
+    accessor: 'is_display',
+    displayType: [
+      { title: 'Không hiển thị', value: 0, color: 'success' },
+      { title: 'Đang hiển thị', value: 1, color: 'success' },
+    ],
+    editTable: true,
+    component: 'select', // Lấy component Select Material UI nếu editTable = true
+  },
+  {
+    label: 'Status',
+    accessor: 'is_status',
+    displayType: [
+      { title: 'Ngừng kinh doanh', value: 0, color: 'success' },
+      { title: 'Đang kinh doanh', value: 1, color: 'success' },
+    ],
+    editTable: true,
+    component: 'select', // Lấy component Select Material UI nếu editTable = true
+  },
   { label: 'Actions', accessor: 'actions', component: 'actions' },
 ];
 
@@ -46,6 +77,16 @@ const actions = [
 ];
 
 function Product() {
+  const { control, setValue, handleSubmit } = useForm({
+    defaultValues: {
+      formList: [],
+    },
+  });
+  const { fields } = useFieldArray({
+    control,
+    name: 'formList',
+  });
+
   const [data, setData] = useState([]);
 
   // State sort
@@ -104,6 +145,20 @@ function Product() {
     [searchValue],
   );
 
+  const onSubmit = handleSubmit(async (data) => {
+    console.log(data);
+    try {
+      const res = await quickUpdateProductApi(data);
+      if (res?.flag) {
+        toast.info(res.message);
+      } else {
+        if (res.status === 200) toast.success(res.message);
+      }
+    } catch (error) {
+      toast.error(error.messages);
+    }
+  });
+
   useEffect(() => {
     if (data.length === 0 && !debounceValue.trim()) {
       getData(sortField, order, page, rowsPerPage);
@@ -114,6 +169,7 @@ function Product() {
 
   return (
     <div className='wrapper'>
+      <ToastContainer />
       <BreadcrumbStyle />
       <Box
         sx={{
@@ -168,7 +224,20 @@ function Product() {
           marginTop: 3,
         }}
       >
-        <Search label='Search supplier name' handleSearch={handleSearch} />
+        <Box display='flex' alignItems='center' justifyContent='space-between'>
+          <Search label='Search supplier name' handleSearch={handleSearch} />
+          {data.length > 0 ? (
+            <ToolTipStyle title='Quickly update status and display'>
+              <Button
+                variant='contained'
+                sx={{ fontSize: '1.3rem' }}
+                onClick={() => onSubmit()}
+              >
+                Quick Update
+              </Button>
+            </ToolTipStyle>
+          ) : null}
+        </Box>
 
         <TableStyle>
           <TableHeadStyle
@@ -179,6 +248,8 @@ function Product() {
             columns={columns}
             tableData={data}
             actions={actions}
+            control={control}
+            setValue={setValue}
           ></TableBodyStyle>
         </TableStyle>
         {data.length > 0 ? (
