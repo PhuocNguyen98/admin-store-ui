@@ -42,7 +42,11 @@ function SelectStyle({ control, name, options, title, ...props }) {
           <FormControl fullWidth>
             <Select
               onChange={onChange}
-              value={value}
+              value={
+                value === undefined || value === null || options.length === 0
+                  ? ''
+                  : value
+              }
               error={!!error}
               {...props}
             >
