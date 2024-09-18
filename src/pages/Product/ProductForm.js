@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
@@ -12,9 +13,12 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { toast, ToastContainer } from 'react-toastify';
 
+import SelectStyle from '~/components/SelectStyle';
 import ButtonStyle from '~/components/ButtonStyle';
+import CKEditorStyle from '~/components/CKEditorStyle';
 import DropzoneStyle from '~/components/DropzoneStyle';
 import BreadcrumbStyle from '~/components/BreadcrumbStyle';
+import NumericFormatStyle from '~/components/NumericFormatStyle';
 import TextFieldStyle from '~/components/FormStyle/TextFieldStyle';
 import TypographyStyle from '~/components/FormStyle/TypographyStyle';
 
@@ -22,17 +26,11 @@ import { convertSlug } from '~/utils/convertSlug';
 import { getSupplierApi } from '~/api/supplierApi';
 import { getCategoryApi } from '~/api/categoryApi';
 import { getDiscountApi } from '~/api/discountApi';
-import images from '~/assets/img';
-
-import classnames from 'classnames/bind';
-import styles from './Product.module.scss';
-import { Grid } from '@mui/material';
-import SelectStyle from '~/components/SelectStyle';
-import CKEditorStyle from '~/components/CKEditorStyle';
-
-import NumericFormatStyle from '~/components/NumericFormatStyle';
-
-const cx = classnames.bind(styles);
+import {
+  getProductByIdApi,
+  addProductApi,
+  updateProductApi,
+} from '~/api/productApi';
 
 const schemaProduct = yup.object().shape({
   productName: yup.string().required('Vui lòng nhập tên sản phẩm'),
@@ -43,6 +41,11 @@ const schemaProduct = yup.object().shape({
     .typeError('Vui lòng kiểm tra lại giá của sản phẩm')
     .min(0, 'Giá trị phải lớn hơn hoặc bằng 0')
     .integer('Giá trị phải là 1 số nguyên'),
+  productInventory: yup
+    .number()
+    .typeError('Vui lòng kiểm tra lại số lượng')
+    .integer('Giá trị phải là số nguyên')
+    .positive('Giá trị phải là số dương'),
   productSupplier: yup.number().typeError('Vui lòng chọn nhà cung cấp'),
   productCategory: yup
     .number()
@@ -51,34 +54,39 @@ const schemaProduct = yup.object().shape({
     .number()
     .nullable()
     .transform((value, original) => (original === '' ? null : value)),
-  productImage: yup.array(),
+  productThumbnail: yup.array(),
+  productImages: yup.array(),
+  productSpecifications: yup.string(),
   productDescription: yup.string(),
 });
 
 function ProductForm() {
   const { id } = useParams(); // Get id
   const [data, setData] = useState([]); // Save data after call API( by id)
-  const [files, setFiles] = useState([]); // Save image new
-  const [filesOld, setFilesOld] = useState([]); // Save image old
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [textValue, setTextValue] = useState(''); // Save text CKEditor
+  const [supplier, setSupplier] = useState([]); // Save data after call API
+  const [category, setCategory] = useState([]); // Save data after call API
+  const [discount, setDiscount] = useState([]); // Save data after call API
 
-  //
-  const [supplier, setSupplier] = useState([]);
-  const [category, setCategory] = useState([]);
-  const [discount, setDiscount] = useState([]);
-  //
+  const [productImages, setProductImages] = useState([]);
+  const [productThumbnail, setProductThumbnail] = useState([]);
+  const [productDescription, setProductDescription] = useState('');
+  const [productSpecifications, setProductSpecifications] = useState('');
+
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const { handleSubmit, control, watch, setValue, clearErrors } = useForm({
     defaultValues: {
       productName: '',
       productSlug: '',
       productSku: '',
-      productPrice: '',
+      productPrice: 0,
+      productInventory: 0,
       productSupplier: '',
       productCategory: '',
       productDiscount: '',
-      productImage: [],
+      productThumbnail: [],
+      productImages: [],
+      productSpecifications: '',
       productDescription: '',
     },
     resolver: yupResolver(schemaProduct),
@@ -98,79 +106,102 @@ function ProductForm() {
   // Handle formdata
   const handleFormData = (data) => {
     const formData = new FormData();
-    formData.append('supplierName', data.supplierName);
-    formData.append('supplierSlug', data.supplierSlug);
-    if (!!data.supplierImage[0]) {
-      formData.append('supplierImage', data.supplierImage[0]);
+    formData.append('productName', data.productName);
+    formData.append('productSlug', data.productSlug);
+    formData.append('productSku', data.productSku);
+    formData.append('productPrice', data.productPrice);
+    formData.append('productInventory', data.productInventory);
+    formData.append('productSupplier', data.productSupplier);
+    formData.append('productCategory', data.productCategory);
+    formData.append('productDiscount', data.productDiscount);
+    formData.append('productSpecifications', data.productSpecifications);
+    formData.append('productDescription', data.productDescription);
+
+    if (!!data.productThumbnail[0]) {
+      formData.append('productThumbnail', data.productThumbnail[0]);
     } else {
-      formData.append('supplierImage', []);
+      formData.append('productThumbnail', []);
     }
+
+    if (data.productImages.length > 0) {
+      for (let i = 0; i < data.productImages.length; i++) {
+        formData.append('productImages', data.productImages[i]);
+      }
+    } else {
+      formData.append('productImages', []);
+    }
+
+    console.log([...formData]);
     return formData;
   };
 
   // Handle click add submit
   const handleAdd = handleSubmit(async (data) => {
-    console.log(data);
-    // setIsSuccess(true);
-    // const formData = handleFormData(data);
-    // try {
-    //   const res = await addSupplierApi(formData);
-    //   toast.success(res.message);
-    //   setValue('supplierName', '');
-    //   setValue('supplierSlug', '');
-    //   setValue('supplierImage', files);
-    //   setFiles([]);
-    //   setIsSuccess(false);
-    // } catch (error) {
-    //   setIsSuccess(false);
-    //   toast.error(error.message);
-    // }
+    setIsSuccess(true);
+    const formData = handleFormData(data);
+    try {
+      const res = await addProductApi(formData);
+      toast.success(res.message);
+      setValue('productName', '');
+      setValue('productSlug', '');
+      setValue('productSku', '');
+      setValue('productPrice', 0);
+      setValue('productInventory', 0);
+      setValue('productSupplier', '');
+      setValue('productCategory', '');
+      setValue('productDiscount', '');
+      setValue('productSpecifications', '');
+      setValue('productDescription', '');
+
+      setProductDescription('');
+      setProductSpecifications('');
+      setProductThumbnail([]);
+      setProductImages([]);
+      setIsSuccess(false);
+    } catch (error) {
+      setIsSuccess(false);
+      toast.error(error.message);
+    }
   });
 
   // Handle click edit submit
   const handleEdit = handleSubmit(async (data) => {
-    // setIsSuccess(true);
-    // const formData = handleFormData(data);
-    // try {
-    //   const res = await updateSupplierApi(id, formData);
-    //   toast.success(res.message);
-    //   setIsSuccess(false);
-    // } catch (error) {
-    //   setIsSuccess(false);
-    //   toast.error(error.message);
-    // }
+    setIsSuccess(true);
+    const formData = handleFormData(data);
+    try {
+      const res = await updateProductApi(id, formData);
+      toast.success(res.message);
+      getDataById(id);
+      setIsSuccess(false);
+    } catch (error) {
+      setIsSuccess(false);
+      toast.error(error.message);
+    }
   });
 
   // Get data by id category
   const getDataById = async (id) => {
-    // try {
-    //   const res = await getSupplierByIdApi(id);
-    //   if (res) {
-    //     setData(res.data);
-    //     setValue('supplierName', res.data[0].name);
-    //     setValue('supplierSlug', res.data[0].slug);
-    //     setFilesOld([res.data[0].thumbnail ?? []]);
-    //   }
-    // } catch (error) {
-    //   toast.error(error.message);
-    // }
-  };
+    try {
+      const res = await getProductByIdApi(id);
+      if (res) {
+        setData(res.data);
+        setProductSpecifications(res.data[0].specifications);
+        setProductDescription(res.data[0].description);
+        setProductThumbnail([res.data[0].thumbnail ?? []]);
+        setProductImages(res.data[0].images ?? []);
 
-  const onErrorImg = (e) => {
-    e.target.src = images.imgPlacehoder;
-  };
-
-  // Render image after get data
-  const renderListImage = () => {
-    return (
-      <ul className={cx('list-image')}>
-        {filesOld.map((file, index) => (
-          <li key={index} className={cx('item-img')}>
-            <img alt='' src={file} onError={(e) => onErrorImg(e)} />
-          </li>
-        ))}
-      </ul>
-    );
+        setValue('productName', res.data[0].name);
+        setValue('productSlug', res.data[0].slug);
+        setValue('productSku', res.data[0].sku);
+        setValue('productPrice', res.data[0].price);
+        setValue('productInventory', res.data[0].inventory);
+        setValue('productSupplier', res.data[0].supplier_id);
+        setValue('productCategory', res.data[0].category_id);
+        setValue('productDiscount', res.data[0].discount_id);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   // Get data select
@@ -240,7 +271,7 @@ function ProductForm() {
       <Divider />
 
       <Paper elevation={6} sx={{ p: '30px', mt: 3 }}>
-        <Grid container spacing={2}>
+        <Grid container spacing={3}>
           <Grid item xs={12} xl={6}>
             <TypographyStyle
               component='label'
@@ -296,40 +327,12 @@ function ProductForm() {
             </Box>
           </Grid>
 
-          <Grid item xs={12} xl={6}>
-            <TypographyStyle
-              component='label'
-              htmlFor='productSku'
-              variant='h5'
-              isRequired={true}
-            >
-              Product SKU
-            </TypographyStyle>
-            <TextFieldStyle
-              control={control}
-              name='productSku'
-              placeholder='Product SKU'
-            />
-          </Grid>
-
-          <Grid item xs={12} xl={6}>
-            <TypographyStyle
-              component='label'
-              htmlFor='productPrice'
-              variant='h5'
-              isRequired={true}
-            >
-              Product price
-            </TypographyStyle>
-
-            <NumericFormatStyle control={control} name='productPrice' />
-          </Grid>
-
           <Grid item xs={12} xl={4}>
             <TypographyStyle
               component='label'
-              htmlFor='productSupplier'
               variant='h5'
+              htmlFor='productSupplier'
+              isRequired={true}
             >
               Product supplier
             </TypographyStyle>
@@ -347,6 +350,7 @@ function ProductForm() {
               component='label'
               variant='h5'
               htmlFor='productCategory'
+              isRequired={true}
             >
               Product category
             </TypographyStyle>
@@ -376,20 +380,104 @@ function ProductForm() {
             />
           </Grid>
 
+          <Grid item xs={12} xl={4}>
+            <TypographyStyle
+              component='label'
+              htmlFor='productSku'
+              variant='h5'
+              isRequired={true}
+            >
+              Product SKU
+            </TypographyStyle>
+            <TextFieldStyle
+              control={control}
+              name='productSku'
+              placeholder='Product SKU'
+            />
+          </Grid>
+
+          <Grid item xs={12} xl={4}>
+            <TypographyStyle
+              component='label'
+              htmlFor='productPrice'
+              variant='h5'
+              isRequired={true}
+            >
+              Product price
+            </TypographyStyle>
+            <NumericFormatStyle
+              control={control}
+              name='productPrice'
+              placeholder='Product Price'
+            />
+          </Grid>
+
+          <Grid item xs={12} xl={4}>
+            <TypographyStyle
+              component='label'
+              htmlFor='productInventory'
+              variant='h5'
+              isRequired={true}
+            >
+              Product inventory
+            </TypographyStyle>
+
+            <TextFieldStyle control={control} name='productInventory' />
+          </Grid>
+
           <Grid item xs={12}>
             <TypographyStyle
               component='label'
               variant='h5'
-              htmlFor='productImage'
+              htmlFor='productThumbnail'
+              isRequired={true}
+              comment='Hình ảnh để làm ảnh đại diện cho sản phẩm'
             >
-              Product image
+              Product thumbnail
             </TypographyStyle>
+
             <DropzoneStyle
               control={control}
-              name='productImage'
+              name='productThumbnail'
+              multiple={false}
+              files={productThumbnail}
+              setFiles={setProductThumbnail}
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <TypographyStyle
+              component='label'
+              variant='h5'
+              htmlFor='productImages'
+              comment='Hình ảnh hiển thị trong trang chi tiết sản phẩm'
+            >
+              Product images
+            </TypographyStyle>
+
+            <DropzoneStyle
+              control={control}
+              name='productImages'
               multiple={true}
-              files={files}
-              setFiles={setFiles}
+              files={productImages}
+              setFiles={setProductImages}
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <TypographyStyle
+              component='label'
+              variant='h5'
+              htmlFor='productSpecifications'
+              comment='Thông số sản phẩm'
+            >
+              Product specifications
+            </TypographyStyle>
+            <CKEditorStyle
+              control={control}
+              name='productSpecifications'
+              textValue={productSpecifications}
+              setTextValue={setProductSpecifications}
             />
           </Grid>
 
@@ -398,28 +486,18 @@ function ProductForm() {
               component='label'
               variant='h5'
               htmlFor='productDescription'
+              comment='Mô tả sản phẩm'
             >
               Product descriptions
             </TypographyStyle>
             <CKEditorStyle
               control={control}
               name='productDescription'
-              textValue={textValue}
-              setTextValue={setTextValue}
+              textValue={productDescription}
+              setTextValue={setProductDescription}
             />
           </Grid>
         </Grid>
-
-        {/* <Box width='50%' component='form' action='POST'>
-          <Box>
-            {data.length > 0 ? (
-              <Box display='flex' alignItems='center' flexWrap='wrap' ml={3}>
-                <span>Image Old: </span>
-                {filesOld.length > 0 ? renderListImage() : null}
-              </Box>
-            ) : null}
-          </Box>
-        </Box> */}
 
         {data.length > 0 ? (
           <ButtonStyle

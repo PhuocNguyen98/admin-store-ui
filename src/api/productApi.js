@@ -9,17 +9,17 @@ export const getProductApi = async (order, sort, page, limit, search) => {
   return res;
 };
 
-// export const getProductByIdApi = async (id) => {
-//   const res = await baseApi.get(`/product/${id}`);
-//   return res;
-// };
+export const getProductByIdApi = async (id) => {
+  const res = await baseApi.get(`/product/${id}`);
+  return res;
+};
 
-// export const addProductApi = async (data) => {
-//   const res = await baseApi.post('/product', data);
-//   return res;
-// };
+export const addProductApi = async (data) => {
+  const res = await baseApi.post('/product', data);
+  return res;
+};
 
-// export const updateProductApi = async (id, data) => {
-//   const res = await baseApi.put(`/product/${id}`, data);
-//   return res;
-// };
+export const updateProductApi = async (id, data) => {
+  const res = await baseApi.put(`/product/${id}`, data);
+  return res;
+};
