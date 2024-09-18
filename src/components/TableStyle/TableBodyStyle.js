@@ -13,6 +13,8 @@ import images from '~/assets/img';
 import classnames from 'classnames/bind';
 import styles from './TableStyle.module.scss';
 
+import { NumericFormat } from 'react-number-format';
+
 import { Controller } from 'react-hook-form';
 
 const cx = classnames.bind(styles);
@@ -105,6 +107,18 @@ function TableBodyStyle({ columns, tableData, actions, control, setValue }) {
                 </MenuItem>
               ))}
             </Select>
+          </TableCell>
+        );
+      }
+      case 'currency': {
+        return (
+          <TableCell key={column.accessor}>
+            <NumericFormat
+              displayType='text'
+              value={data}
+              suffix=' vnd'
+              thousandSeparator
+            />
           </TableCell>
         );
       }
