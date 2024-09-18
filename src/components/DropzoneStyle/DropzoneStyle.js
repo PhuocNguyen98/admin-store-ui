@@ -50,9 +50,14 @@ function DropzoneStyle({
   }, [files]);
 
   const removeThumb = (file) => {
-    setFiles((prevFiles) =>
-      prevFiles.filter((item) => item.name !== file.name),
-    );
+    const newFiles = files.filter((item) => {
+      if (item?.name) {
+        return item.name !== file.name;
+      } else {
+        return item !== file;
+      }
+    });
+    setFiles(newFiles);
   };
 
   return (
@@ -84,7 +89,7 @@ function DropzoneStyle({
               {files.map((file, index) => (
                 <div key={index} className={cx('thumb-item')}>
                   <img
-                    src={file.preview}
+                    src={file?.preview ? file.preview : file}
                     alt=''
                     className={cx('thumb-img')}
                     onLoad={() => {
