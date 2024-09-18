@@ -44,6 +44,7 @@ function NumericFormatStyle({ control, name, ...props }) {
             <NumericFormat
               error={!!error}
               value={value}
+              suffix=' vnd'
               customInput={TextField}
               thousandSeparator
               onValueChange={(e) => onChange(e.value)}
