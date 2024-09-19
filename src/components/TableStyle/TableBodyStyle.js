@@ -125,23 +125,28 @@ function TableBodyStyle({ columns, tableData, actions, control, setValue }) {
       case 'actions': {
         return (
           <TableCell key={column.accessor}>
-            {actions.map((action, index) => (
-              <Link
-                key={index}
-                to={action.to ? `${action.to}/${id}` : null}
-                className={cx('action-link')}
-              >
-                <Button
-                  component='div'
-                  variant='contained'
-                  startIcon={action.icon}
-                  onClick={action?.onClick ? action.onClick : null}
-                  {...action?.css}
-                >
-                  {action.title}
-                </Button>
-              </Link>
-            ))}
+            {actions.map((action, index) => {
+              if (action?.to) {
+                return (
+                  <Link
+                    key={index}
+                    to={action?.to ? `${action.to}/${id}` : null}
+                    className={cx('action-link')}
+                  >
+                    <Button
+                      data-edit={1}
+                      component='div'
+                      variant='contained'
+                      startIcon={action?.icon}
+                      // onClick={action?.onClick ? action.onClick : null}
+                      {...action?.css}
+                    >
+                      {action?.title}
+                    </Button>
+                  </Link>
+                );
+              }
+            })}
           </TableCell>
         );
       }
@@ -188,7 +193,7 @@ function TableBodyStyle({ columns, tableData, actions, control, setValue }) {
   return (
     <ThemeProvider theme={theme}>
       <TableBody>
-        {tableData.length > 0 ? (
+        {tableData && tableData.length > 0 ? (
           renderTableBody()
         ) : (
           <TableRow>
