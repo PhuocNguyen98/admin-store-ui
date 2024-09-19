@@ -6,6 +6,7 @@ const routes = {
   supplier: '/supplier',
   discount: '/discount',
   product: '/product',
+  staff: '/staff',
 };
 
 export const category = {

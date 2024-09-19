@@ -20,6 +20,9 @@ import DiscountForm from '~/pages/Discount/DiscountForm';
 import Product from '~/pages/Product';
 import ProductForm from '~/pages/Product/ProductForm';
 
+// Staff
+import Staff from '~/pages/Staff';
+
 // routes need login
 export const privateRoutes = [
   { path: config.routes.logout, component: Logout, layout: null },
@@ -43,6 +46,9 @@ export const privateRoutes = [
   { path: config.routes.product, component: Product },
   { path: config.product.add, component: ProductForm },
   { path: config.product.edit, component: ProductForm },
+
+  // Staff
+  { path: config.routes.staff, component: Staff },
 ];
 
 //routes not login

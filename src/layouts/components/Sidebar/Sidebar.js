@@ -42,11 +42,11 @@ const NAV_LIST = [
         title: 'Product',
         to: '/product',
       },
-      {
-        icon: <InventoryIcon />,
-        title: 'Inventory',
-        to: '/',
-      },
+      // {
+      //   icon: <InventoryIcon />,
+      //   title: 'Inventory',
+      //   to: '/',
+      // },
       {
         icon: <DiscountIcon />,
         title: 'Discount',
@@ -70,7 +70,7 @@ const NAV_LIST = [
       {
         icon: <PeopleIcon />,
         title: 'Staff',
-        to: '/',
+        to: '/staff',
       },
     ],
   },
