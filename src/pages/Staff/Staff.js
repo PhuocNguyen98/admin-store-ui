@@ -25,6 +25,13 @@ import TablePaginationStyle from '~/components/TableStyle/TablePaginationStyle';
 
 import StaffModal from './StaffModal';
 import { getStaffApi } from '~/api/staffApi';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchDataSuccess } from '~/store/actionsType/staffActions';
+
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import { getStaffRoleApi } from '~/api/staffApi';
+import { fetchDataSuccess as fetchDataRoleSuccess } from '~/store/actionsType/staffRoleActions';
 
 // Define column table
 const columns = [
@@ -42,11 +49,14 @@ const columns = [
     component: 'text',
     sortTable: true,
   },
+
   { label: 'Actions', accessor: 'actions', component: 'actions' },
 ];
 
 function Staff() {
-  const [data, setData] = useState([]);
+  const dispatch = useDispatch();
+  const staffs = useSelector((state) => state.staff);
+  const roles = useSelector((state) => state.role);
 
   // State sort
   const { sortField, order, setSortField, setOrder } = useSortTable(
@@ -92,7 +102,7 @@ function Staff() {
     page++;
     const res = await getStaffApi(order, sort, page, rowsPerPage, search);
     if (res) {
-      setData(res.data);
+      dispatch(fetchDataSuccess(res));
       setPagination(res.pagination);
     }
   };
@@ -113,13 +123,30 @@ function Staff() {
     [searchValue],
   );
 
+  const getStaffRole = async () => {
+    const result = await getStaffRoleApi();
+    if ((result?.data).length > 0) {
+      dispatch(fetchDataRoleSuccess(result));
+    }
+  };
+
   useEffect(() => {
-    if (data.length === 0 && !debounceValue.trim()) {
+    if (staffs.data.length === 0 && !debounceValue.trim()) {
       getData(sortField, order, page, rowsPerPage);
     } else {
       getData(sortField, order, 0, rowsPerPage, searchValue);
     }
   }, [debounceValue]);
+
+  useEffect(() => {
+    let totalRows = staffs.data.length;
+    let newPagination = { totalRows };
+    setPagination(newPagination);
+  }, [staffs.data.length]);
+
+  useEffect(() => {
+    getStaffRole();
+  }, [roles.data.length]);
 
   return (
     <div className='wrapper'>
@@ -185,13 +212,21 @@ function Staff() {
             handleSorting={handleSorting}
           ></TableHeadStyle>
           <TableBody>
-            {data.map((item, index) => {
+            {staffs.data.map((item, index) => {
               return (
                 <TableRow key={index}>
-                  <TableCell>{item.stt}</TableCell>
+                  <TableCell>{index + 1}</TableCell>
                   <TableCell>{item.username}</TableCell>
                   <TableCell>{item.email}</TableCell>
-                  <TableCell>{item.role}</TableCell>
+                  <TableCell>
+                    <Select value={item.role_id}>
+                      {roles.data.map((col) => (
+                        <MenuItem key={col.value} value={col.value}>
+                          {col.title}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </TableCell>
                   <TableCell>
                     <Button
                       startIcon={<EditIcon />}
@@ -205,7 +240,7 @@ function Staff() {
             })}
           </TableBody>
         </TableStyle>
-        {data.length > 0 ? (
+        {staffs.data.length > 0 ? (
           <TablePaginationStyle
             rowsPerPageValue={pagination.rowsPerPage}
             totalRowsValue={pagination.totalRows}

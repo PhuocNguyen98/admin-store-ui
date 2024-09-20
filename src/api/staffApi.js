@@ -1,5 +1,6 @@
 import { baseApi } from '~/utils/axios';
 
+// Staff
 export const getStaffApi = async (order, sort, page, limit, search) => {
   let url = `/staff`;
 
@@ -34,5 +35,11 @@ export const addStaffApi = async (data) => {
 
 export const updateStaffApi = async (id, data) => {
   const res = await baseApi.put(`/staff/${id}`, data);
+  return res;
+};
+
+// Staff Role
+export const getStaffRoleApi = async () => {
+  const res = await baseApi.get('/staff/role');
   return res;
 };

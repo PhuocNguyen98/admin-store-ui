@@ -26,24 +26,14 @@ import OutlinedInputStyle from '~/components/FormStyle/OutlinedInputStyle';
 import classname from 'classnames/bind';
 import styles from './Staff.module.scss';
 
-import { addStaffApi, updateStaffApi } from '~/api/staffApi';
+import { addStaffApi, updateStaffApi, getStaffRoleApi } from '~/api/staffApi';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  fetchAddSuccess,
+  fetchEditSuccess,
+} from '~/store/actionsType/staffActions';
 
 const cx = classname.bind(styles);
-
-const optionsRole = [
-  {
-    title: 'Admin',
-    value: 1,
-  },
-  {
-    title: 'Nhân viên',
-    value: 2,
-  },
-  {
-    title: 'Trưởng phòng',
-    value: 3,
-  },
-];
 
 const schemaStaff = yup.object().shape({
   staffUsername: yup.string().required('Vui lòng nhập username'),
@@ -60,6 +50,8 @@ const schemaStaff = yup.object().shape({
 
 function StaffModal({ open, setOpen, data, setDataEdit }) {
   const [id, setId] = useState('');
+  const dispatch = useDispatch();
+  const roles = useSelector((state) => state.role);
 
   const { handleSubmit, control, setValue, reset } = useForm({
     defaultValues: {
@@ -96,6 +88,7 @@ function StaffModal({ open, setOpen, data, setDataEdit }) {
     try {
       const result = await addStaffApi(data);
       if (result.status === 201) {
+        dispatch(fetchAddSuccess(result));
         setValue('staffUsername', '');
         setValue('staffPassword', '');
         setValue('staffConfirmPassword', '');
@@ -111,6 +104,7 @@ function StaffModal({ open, setOpen, data, setDataEdit }) {
   const handleEdit = handleSubmit(async (data) => {
     let result = await updateStaffApi(id, data);
     if (result.status === 200) {
+      dispatch(fetchEditSuccess(data));
       setDataEdit({});
       setOpen(false);
       toast.success(result.message);
@@ -192,41 +186,39 @@ function StaffModal({ open, setOpen, data, setDataEdit }) {
                 placeholder='Username'
               />
             </Grid>
+            {/* {Object.keys(data).length > 0 ? null : ( */}
+            <Grid item xs={12} md={6}>
+              <TypographyStyle
+                component='label'
+                htmlFor='staffPassword'
+                variant='h5'
+                isRequired={true}
+              >
+                Password
+              </TypographyStyle>
 
-            {Object.keys(data).length > 0 ? null : (
-              <Grid item xs={12} md={6}>
-                <TypographyStyle
-                  component='label'
-                  htmlFor='staffPassword'
-                  variant='h5'
-                  isRequired={true}
-                >
-                  Password
-                </TypographyStyle>
-
-                <FormControl fullWidth>
-                  <OutlinedInputStyle
-                    control={control}
-                    name='staffPassword'
-                    placeholder='Password'
-                    type={showPassword ? 'text' : 'password'}
-                    endAdornment={
-                      <InputAdornment position='end'>
-                        <IconButton
-                          onClick={() => handleClickShowPassword()}
-                          onMouseDown={(e) => handleMouseDownPassword(e)}
-                          onMouseUp={(e) => handleMouseUpPassword(e)}
-                          edge='end'
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                  />
-                </FormControl>
-              </Grid>
-            )}
-
+              <FormControl fullWidth>
+                <OutlinedInputStyle
+                  control={control}
+                  name='staffPassword'
+                  placeholder='Password'
+                  type={showPassword ? 'text' : 'password'}
+                  endAdornment={
+                    <InputAdornment position='end'>
+                      <IconButton
+                        onClick={() => handleClickShowPassword()}
+                        onMouseDown={(e) => handleMouseDownPassword(e)}
+                        onMouseUp={(e) => handleMouseUpPassword(e)}
+                        edge='end'
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                />
+              </FormControl>
+            </Grid>
+            {/* )} */}
             <Grid item xs={12} md={6}>
               <TypographyStyle
                 component='label'
@@ -240,44 +232,44 @@ function StaffModal({ open, setOpen, data, setDataEdit }) {
               <SelectStyle
                 control={control}
                 name='staffRole'
-                options={optionsRole}
+                options={roles.data}
                 title='Chọn quyền hạn cho tài khoản'
               />
             </Grid>
 
-            {Object.keys(data).length > 0 ? null : (
-              <Grid item xs={12} md={6}>
-                <TypographyStyle
-                  component='label'
-                  htmlFor='staffConfirmPassword'
-                  variant='h5'
-                  isRequired={true}
-                >
-                  Confirm Password
-                </TypographyStyle>
+            {/* {Object.keys(data).length > 0 ? null : ( */}
+            <Grid item xs={12} md={6}>
+              <TypographyStyle
+                component='label'
+                htmlFor='staffConfirmPassword'
+                variant='h5'
+                isRequired={true}
+              >
+                Confirm Password
+              </TypographyStyle>
 
-                <FormControl fullWidth>
-                  <OutlinedInputStyle
-                    control={control}
-                    name='staffConfirmPassword'
-                    placeholder='Confirm password'
-                    type={showPassword ? 'text' : 'password'}
-                    endAdornment={
-                      <InputAdornment position='end'>
-                        <IconButton
-                          onClick={() => handleClickShowPassword()}
-                          onMouseDown={(e) => handleMouseDownPassword(e)}
-                          onMouseUp={(e) => handleMouseUpPassword(e)}
-                          edge='end'
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                  />
-                </FormControl>
-              </Grid>
-            )}
+              <FormControl fullWidth>
+                <OutlinedInputStyle
+                  control={control}
+                  name='staffConfirmPassword'
+                  placeholder='Confirm password'
+                  type={showPassword ? 'text' : 'password'}
+                  endAdornment={
+                    <InputAdornment position='end'>
+                      <IconButton
+                        onClick={() => handleClickShowPassword()}
+                        onMouseDown={(e) => handleMouseDownPassword(e)}
+                        onMouseUp={(e) => handleMouseUpPassword(e)}
+                        edge='end'
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                />
+              </FormControl>
+            </Grid>
+            {/* )} */}
           </Grid>
           {Object.keys(data).length > 0 ? (
             <Button
