@@ -23,23 +23,17 @@ export const getStaffApi = async (order, sort, page, limit, search) => {
   return res;
 };
 
-// export const getStaffByIdApi = async (id) => {
-//   const res = await baseApi.get(`/staff/${id}`);
-//   return res;
-// };
-
-export const addStaffApi = async (data) => {
-  const res = await baseApi.post('/staff', data);
+export const getStaffByIdApi = async (id) => {
+  const res = await baseApi.get(`/staff/${id}`);
   return res;
 };
 
-export const updateStaffApi = async (id, data) => {
-  const res = await baseApi.put(`/staff/${id}`, data);
+export const addStaffAccountApi = async (data) => {
+  const res = await baseApi.post('/staff/account', data);
   return res;
 };
 
-// Staff Role
-export const getStaffRoleApi = async () => {
-  const res = await baseApi.get('/staff/role');
+export const updateStaffAccountApi = async (data) => {
+  const res = await baseApi.put(`/staff/account`, data);
   return res;
 };

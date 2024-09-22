@@ -3,14 +3,12 @@ import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
-import TableBody from '@mui/material/TableBody';
-import TableRow from '@mui/material/TableRow';
-import TableCell from '@mui/material/TableCell';
 
-import EditIcon from '@mui/icons-material/Edit';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
 
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { useState, useEffect, useCallback } from 'react';
 
 import useDebounce from '~/hooks/useDebounce';
@@ -19,19 +17,16 @@ import usePagination from '~/hooks/usePagination';
 
 import Search from '~/components/Search';
 import TableStyle from '~/components/TableStyle';
+import ToolTipStyle from '~/components/ToolTipStyle';
 import BreadcrumbStyle from '~/components/BreadcrumbStyle';
 import TableHeadStyle from '~/components/TableStyle/TableHeadStyle';
+import TableBodyStyle from '~/components/TableStyle/TableBodyStyle';
 import TablePaginationStyle from '~/components/TableStyle/TablePaginationStyle';
 
-import StaffModal from './StaffModal';
 import { getStaffApi } from '~/api/staffApi';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchDataSuccess } from '~/store/actionsType/staffActions';
+import { updateStaffAccountApi } from '~/api/staffApi';
 
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import { getStaffRoleApi } from '~/api/staffApi';
-import { fetchDataSuccess as fetchDataRoleSuccess } from '~/store/actionsType/staffRoleActions';
+import StaffModal from './StaffModal';
 
 // Define column table
 const columns = [
@@ -45,23 +40,58 @@ const columns = [
   { label: 'Email', accessor: 'email', component: 'text', sortTable: true },
   {
     label: 'Role',
-    accessor: 'role',
-    component: 'text',
-    sortTable: true,
+    accessor: 'role_id',
+    displayType: [
+      { title: 'Admin', value: 1 },
+      { title: 'Trưởng phòng', value: 2 },
+      { title: 'Nhân viên', value: 3 },
+    ],
+    editTable: true,
+    component: 'select',
   },
-
+  {
+    label: 'Status',
+    accessor: 'is_status',
+    displayType: [
+      { title: 'Vô hiệu hóa', value: 0 },
+      { title: 'Đang kích hoạt', value: 1 },
+    ],
+    editTable: true,
+    component: 'select',
+  },
   { label: 'Actions', accessor: 'actions', component: 'actions' },
 ];
 
+// Define column action table
+const actions = [
+  {
+    icon: <VisibilityIcon />,
+    title: 'View',
+    to: '/staff/view',
+    css: {
+      color: 'info',
+    },
+  },
+];
+
 function Staff() {
-  const dispatch = useDispatch();
-  const staffs = useSelector((state) => state.staff);
-  const roles = useSelector((state) => state.role);
+  const [data, setData] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { control, setValue, handleSubmit } = useForm({
+    defaultValues: {
+      formList: [],
+    },
+  });
+  const { fields } = useFieldArray({
+    control,
+    name: 'formList',
+  });
 
   // State sort
   const { sortField, order, setSortField, setOrder } = useSortTable(
     'id',
-    'asc',
+    'desc',
   );
 
   // State pagination
@@ -75,15 +105,6 @@ function Staff() {
   // State search table
   const [searchValue, setSearchValue] = useState('');
   const debounceValue = useDebounce(searchValue, 500);
-
-  const [dataEdit, setDataEdit] = useState({});
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-
-  const handleEdit = (data) => {
-    setOpen(true);
-    setDataEdit(data);
-  };
 
   // Hanle change page
   const handleChangePage = (newPage, rowsPerPage) => {
@@ -102,7 +123,7 @@ function Staff() {
     page++;
     const res = await getStaffApi(order, sort, page, rowsPerPage, search);
     if (res) {
-      dispatch(fetchDataSuccess(res));
+      setData(res.data);
       setPagination(res.pagination);
     }
   };
@@ -123,30 +144,30 @@ function Staff() {
     [searchValue],
   );
 
-  const getStaffRole = async () => {
-    const result = await getStaffRoleApi();
-    if ((result?.data).length > 0) {
-      dispatch(fetchDataRoleSuccess(result));
-    }
-  };
-
   useEffect(() => {
-    if (staffs.data.length === 0 && !debounceValue.trim()) {
+    if (data.length === 0 && !debounceValue.trim()) {
       getData(sortField, order, page, rowsPerPage);
     } else {
       getData(sortField, order, 0, rowsPerPage, searchValue);
     }
-  }, [debounceValue]);
+  }, [debounceValue, isLoading]);
 
-  useEffect(() => {
-    let totalRows = staffs.data.length;
-    let newPagination = { totalRows };
-    setPagination(newPagination);
-  }, [staffs.data.length]);
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      const result = await updateStaffAccountApi(data);
+      if (result.status === 200) {
+        if (result?.flag) {
+          toast.info(result.message);
+        } else {
+          toast.success(result.message);
+        }
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  });
 
-  useEffect(() => {
-    getStaffRole();
-  }, [roles.data.length]);
+  const handleOpen = () => setOpen(true);
 
   return (
     <div className='wrapper'>
@@ -190,7 +211,7 @@ function Staff() {
           startIcon={<ControlPointIcon />}
           onClick={handleOpen}
         >
-          Add staff
+          Create account
         </Button>
       </Box>
 
@@ -204,43 +225,41 @@ function Staff() {
           marginTop: 3,
         }}
       >
-        <Search label='Search staff username' handleSearch={handleSearch} />
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <Search label='Search staff username' handleSearch={handleSearch} />
+          {data.length > 0 ? (
+            <ToolTipStyle title='Cập nhật nhanh quyền và trạng thái'>
+              <Button
+                variant='contained'
+                sx={{ fontSize: '1.3rem' }}
+                onClick={() => onSubmit()}
+              >
+                Quick Update
+              </Button>
+            </ToolTipStyle>
+          ) : null}
+        </Box>
 
         <TableStyle>
           <TableHeadStyle
             columns={columns}
             handleSorting={handleSorting}
           ></TableHeadStyle>
-          <TableBody>
-            {staffs.data.map((item, index) => {
-              return (
-                <TableRow key={index}>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>{item.username}</TableCell>
-                  <TableCell>{item.email}</TableCell>
-                  <TableCell>
-                    <Select value={item.role_id}>
-                      {roles.data.map((col) => (
-                        <MenuItem key={col.value} value={col.value}>
-                          {col.title}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      startIcon={<EditIcon />}
-                      onClick={() => handleEdit(item)}
-                    >
-                      Edit
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
+          <TableBodyStyle
+            columns={columns}
+            tableData={data}
+            actions={actions}
+            control={control}
+            setValue={setValue}
+          ></TableBodyStyle>
         </TableStyle>
-        {staffs.data.length > 0 ? (
+        {data.length > 0 ? (
           <TablePaginationStyle
             rowsPerPageValue={pagination.rowsPerPage}
             totalRowsValue={pagination.totalRows}
@@ -251,12 +270,7 @@ function Staff() {
         ) : null}
       </Paper>
 
-      <StaffModal
-        open={open}
-        setOpen={setOpen}
-        data={dataEdit}
-        setDataEdit={setDataEdit}
-      />
+      <StaffModal open={open} setOpen={setOpen} setIsLoading={setIsLoading} />
     </div>
   );
 }

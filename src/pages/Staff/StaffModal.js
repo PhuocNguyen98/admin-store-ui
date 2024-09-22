@@ -12,7 +12,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 import { useForm } from 'react-hook-form';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 import * as yup from 'yup';
 import { toast } from 'react-toastify';
@@ -26,20 +26,21 @@ import OutlinedInputStyle from '~/components/FormStyle/OutlinedInputStyle';
 import classname from 'classnames/bind';
 import styles from './Staff.module.scss';
 
-import { addStaffApi, updateStaffApi, getStaffRoleApi } from '~/api/staffApi';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  fetchAddSuccess,
-  fetchEditSuccess,
-} from '~/store/actionsType/staffActions';
+import { addStaffAccountApi } from '~/api/staffApi';
 
 const cx = classname.bind(styles);
+
+const optionRoles = [
+  { title: 'Admin', value: 1 },
+  { title: 'Trưởng phòng', value: 2 },
+  { title: 'Nhân viên', value: 3 },
+];
 
 const schemaStaff = yup.object().shape({
   staffUsername: yup.string().required('Vui lòng nhập username'),
   staffPassword: yup
     .string()
-    .min(3, 'Mật khẩu phải có tối thiểu 8 ký tự')
+    .min(8, 'Mật khẩu phải có tối thiểu 8 ký tự')
     .required('Vui lòng nhập password'),
   staffConfirmPassword: yup
     .string()
@@ -48,12 +49,9 @@ const schemaStaff = yup.object().shape({
   staffRole: yup.string().required('Vui lòng chọn quyền hạn cho tài khoản'),
 });
 
-function StaffModal({ open, setOpen, data, setDataEdit }) {
-  const [id, setId] = useState('');
-  const dispatch = useDispatch();
-  const roles = useSelector((state) => state.role);
-
-  const { handleSubmit, control, setValue, reset } = useForm({
+function StaffModal({ open, setOpen, setIsLoading }) {
+  const [showPassword, setShowPassword] = useState(false);
+  const { handleSubmit, control, reset } = useForm({
     defaultValues: {
       staffUsername: '',
       staffPassword: '',
@@ -63,18 +61,17 @@ function StaffModal({ open, setOpen, data, setDataEdit }) {
     resolver: yupResolver(schemaStaff),
   });
 
-  const [showPassword, setShowPassword] = useState(false);
-
   const handleClickShowPassword = () => setShowPassword((show) => !show);
+
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
+
   const handleMouseUpPassword = (event) => {
     event.preventDefault();
   };
 
   const handleClose = () => {
-    setDataEdit({});
     setOpen(false);
     reset({
       staffUsername: '',
@@ -86,40 +83,22 @@ function StaffModal({ open, setOpen, data, setDataEdit }) {
 
   const handleAdd = handleSubmit(async (data) => {
     try {
-      const result = await addStaffApi(data);
+      const result = await addStaffAccountApi(data);
       if (result.status === 201) {
-        dispatch(fetchAddSuccess(result));
-        setValue('staffUsername', '');
-        setValue('staffPassword', '');
-        setValue('staffConfirmPassword', '');
-        setValue('staffRole', '');
+        reset({
+          staffUsername: '',
+          staffPassword: '',
+          staffConfirmPassword: '',
+          staffRole: '',
+        });
         setOpen(false);
         toast.success(result.message);
+        setIsLoading(true);
       }
     } catch (error) {
       toast.error(error.message);
     }
   });
-
-  const handleEdit = handleSubmit(async (data) => {
-    let result = await updateStaffApi(id, data);
-    if (result.status === 200) {
-      dispatch(fetchEditSuccess(data));
-      setDataEdit({});
-      setOpen(false);
-      toast.success(result.message);
-    }
-  });
-
-  useEffect(() => {
-    if (Object.keys(data).length > 0) {
-      setValue('staffUsername', data?.username);
-      setValue('staffPassword', data?.password);
-      setValue('staffConfirmPassword', data?.password);
-      setValue('staffRole', data?.role_id);
-      setId(data?.id);
-    }
-  }, [data]);
 
   return (
     <div className='wrapper'>
@@ -151,9 +130,7 @@ function StaffModal({ open, setOpen, data, setDataEdit }) {
                   paddingBottom: 1,
                 }}
               >
-                {Object.keys(data).length > 0
-                  ? 'Edit staff for the system'
-                  : 'Create new staff for the system'}
+                Create account staff for the system
               </Typography>
             </Box>
             <IconButton
@@ -170,8 +147,8 @@ function StaffModal({ open, setOpen, data, setDataEdit }) {
             </IconButton>
           </Box>
 
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
               <TypographyStyle
                 component='label'
                 htmlFor='staffUsername'
@@ -186,8 +163,8 @@ function StaffModal({ open, setOpen, data, setDataEdit }) {
                 placeholder='Username'
               />
             </Grid>
-            {/* {Object.keys(data).length > 0 ? null : ( */}
-            <Grid item xs={12} md={6}>
+
+            <Grid item xs={12}>
               <TypographyStyle
                 component='label'
                 htmlFor='staffPassword'
@@ -218,27 +195,8 @@ function StaffModal({ open, setOpen, data, setDataEdit }) {
                 />
               </FormControl>
             </Grid>
-            {/* )} */}
-            <Grid item xs={12} md={6}>
-              <TypographyStyle
-                component='label'
-                htmlFor='staffRole'
-                variant='h5'
-                isRequired={true}
-              >
-                Role
-              </TypographyStyle>
 
-              <SelectStyle
-                control={control}
-                name='staffRole'
-                options={roles.data}
-                title='Chọn quyền hạn cho tài khoản'
-              />
-            </Grid>
-
-            {/* {Object.keys(data).length > 0 ? null : ( */}
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12}>
               <TypographyStyle
                 component='label'
                 htmlFor='staffConfirmPassword'
@@ -269,25 +227,33 @@ function StaffModal({ open, setOpen, data, setDataEdit }) {
                 />
               </FormControl>
             </Grid>
-            {/* )} */}
+
+            <Grid item xs={12}>
+              <TypographyStyle
+                component='label'
+                htmlFor='staffRole'
+                variant='h5'
+                isRequired={true}
+              >
+                Role
+              </TypographyStyle>
+
+              <SelectStyle
+                control={control}
+                name='staffRole'
+                options={optionRoles}
+                title='Chọn quyền hạn cho tài khoản'
+              />
+            </Grid>
           </Grid>
-          {Object.keys(data).length > 0 ? (
-            <Button
-              variant='contained'
-              sx={{ fontSize: '1.3rem', mt: 3 }}
-              onClick={() => handleEdit()}
-            >
-              Update staff
-            </Button>
-          ) : (
-            <Button
-              variant='contained'
-              sx={{ fontSize: '1.3rem', mt: 3 }}
-              onClick={() => handleAdd()}
-            >
-              Create staff
-            </Button>
-          )}
+
+          <Button
+            variant='contained'
+            sx={{ fontSize: '1.3rem', mt: 3 }}
+            onClick={() => handleAdd()}
+          >
+            Create account
+          </Button>
         </Box>
       </Modal>
     </div>

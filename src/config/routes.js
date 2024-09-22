@@ -29,4 +29,9 @@ export const product = {
   edit: '/product/edit/:id',
 };
 
+export const staff = {
+  add: '/staff/add',
+  view: '/staff/view/:id',
+};
+
 export default routes;
