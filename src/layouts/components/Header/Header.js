@@ -6,8 +6,9 @@ import Avatar from '@mui/material/Avatar';
 import Logout from '@mui/icons-material/Logout';
 import MenuIcon from '@mui/icons-material/Menu';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Typography from '@mui/material/Typography';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 import images from '~/assets/img';
@@ -15,14 +16,21 @@ import config from '~/config';
 import MenuStyle from '~/components/PopperStyle/MenuStyle';
 import useToken from '~/hooks/useToken';
 
+import { getAccountStaff } from '~/api/authApi';
+
 const cx = classnames.bind(styles);
 
 const MENU_ITEMS = [
   {
-    icon: <Logout fontSize="large" />,
+    icon: <AccountCircleIcon fontSize='large' />,
+    title: 'Profile',
+    to: config.routes.profile,
+    separate: true,
+  },
+  {
+    icon: <Logout fontSize='large' />,
     title: 'Logout',
     to: config.routes.logout,
-    // separate: true,
   },
 ];
 
@@ -30,6 +38,7 @@ function Header() {
   const { getAuth } = useToken();
   const userAuth = getAuth();
   const [anchorEl, setAnchorEl] = useState(null);
+  const [account, setAccount] = useState({});
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -50,26 +59,37 @@ function Header() {
     setShowSidebar(!showSidebar);
   };
 
+  const getInfoAccount = async () => {
+    const res = await getAccountStaff();
+    if (res?.data?.status === 200 && res.data?.account) {
+      setAccount(res.data.account);
+    }
+  };
+
+  useEffect(() => {
+    getInfoAccount();
+  }, [userAuth]);
+
   return (
     <Box className={cx('wrapper')}>
       <Box className={cx('logo')} ref={refLogo}>
         <Link to={config.routes.dashboard}>
-          <img src={images.logo1} alt="Logo" />
+          <img src={images.logo1} alt='Logo' />
         </Link>
       </Box>
       <Box
-        flex="1"
-        display="flex"
-        alignItems="center"
-        justifyContent="space-between"
+        flex='1'
+        display='flex'
+        alignItems='center'
+        justifyContent='space-between'
         sx={{
           paddingLeft: 1,
           paddingRight: 6,
         }}
       >
         <Box>
-          <IconButton size="large" onClick={() => handleClickMenu()}>
-            <MenuIcon fontSize="large" />
+          <IconButton size='large' onClick={() => handleClickMenu()}>
+            <MenuIcon fontSize='large' />
           </IconButton>
         </Box>
         <Box
@@ -81,7 +101,7 @@ function Header() {
           }}
         >
           <IconButton
-            size="small"
+            size='small'
             sx={{
               border: '1px solid #ddd',
               ':hover': {
@@ -89,26 +109,26 @@ function Header() {
               },
             }}
             aria-controls={open ? 'account-menu' : undefined}
-            aria-haspopup="true"
+            aria-haspopup='true'
             aria-expanded={open ? 'true' : undefined}
           >
             <Avatar
               sx={{ width: 32, height: 32 }}
-              src={images.avatar}
-              alt="Avatar"
+              src={account?.avatar ? account.avatar : images.staffPlacehoder}
+              alt='Avatar'
             />
           </IconButton>
           {userAuth ? (
             <Typography
-              component="span"
-              variant="h5"
+              component='span'
+              variant='h5'
               sx={{
                 pl: 1,
                 display: 'inline-flex',
                 alignItems: 'center',
               }}
             >
-              {userAuth?.username}
+              {account?.username}
               <KeyboardArrowDownIcon sx={{ ml: 0.5 }} />
             </Typography>
           ) : (

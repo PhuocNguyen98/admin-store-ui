@@ -1,33 +1,39 @@
-import CssBaseline from '@mui/material/CssBaseline';
-import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
-import FormControl from '@mui/material/FormControl';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormHelperText from '@mui/material/FormHelperText';
-import InputLabel from '@mui/material/InputLabel';
-import TextField from '@mui/material/TextField';
-import InputAdornment from '@mui/material/InputAdornment';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
+import Container from '@mui/material/Container';
+import TextField from '@mui/material/TextField';
+import InputLabel from '@mui/material/InputLabel';
 import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import CssBaseline from '@mui/material/CssBaseline';
+import FormControl from '@mui/material/FormControl';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import FormHelperText from '@mui/material/FormHelperText';
+import InputAdornment from '@mui/material/InputAdornment';
+import FormControlLabel from '@mui/material/FormControlLabel';
+
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { VisibilityOff, Visibility } from '@mui/icons-material';
+
 import { useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
-import { yupResolver } from '@hookform/resolvers/yup';
+import { useForm, Controller } from 'react-hook-form';
+
 import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+import PropTypes from 'prop-types';
+
+import config from '~/config';
+import images from '~/assets/img';
 
 import classNames from 'classnames/bind';
 import styles from './Login.module.scss';
-import PropTypes from 'prop-types';
 
-import images from '~/assets/img';
-import { loginUser } from '~/api/authApi';
-import config from '~/config';
+import { loginStaff } from '~/api/authApi';
+import { toast, ToastContainer } from 'react-toastify';
 
 const cx = classNames.bind(styles);
 const loginSchema = yup.object({
@@ -84,7 +90,7 @@ const themeLogin = createTheme({
 
 function Login({ setToken }) {
   const navigate = useNavigate();
-  const { handleSubmit, control, setError } = useForm({
+  const { handleSubmit, control } = useForm({
     defaultValues: {
       username: '',
       password: '',
@@ -94,22 +100,18 @@ function Login({ setToken }) {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
-
   const handleMouseDownPassword = (e) => {
     e.preventDefault();
   };
 
   const onSubmit = handleSubmit(async (data) => {
-    try {
-      const res = await loginUser(data);
-      setToken(res);
+    const res = await loginStaff(data);
+    if (res?.data?.status === 200) {
+      toast.success('Login success');
+      setToken(res.data?.access_token);
       navigate(config.routes.dashboard, { replace: true });
-    } catch (error) {
-      const err = error.response.data;
-      setError(err.fieldError, {
-        type: 'manual',
-        message: err.error,
-      });
+    } else {
+      toast.error(res?.data?.message ?? 'error');
     }
   });
 
@@ -125,7 +127,7 @@ function Login({ setToken }) {
           className={cx('inner')}
         >
           <CssBaseline />
-          <img src={images.logo} alt='Logo' className={cx('logo')} />
+          {/* <img src={images.logo} alt='Logo' className={cx('logo')} /> */}
           <Box
             display={'flex'}
             flexDirection={'column'}
@@ -150,7 +152,7 @@ function Login({ setToken }) {
                         fullWidth
                         id='username'
                         label='Username'
-                        placeholder='Username or Email'
+                        placeholder='Username'
                         value={value}
                         onChange={onChange}
                         error={error ? true : false}
@@ -177,6 +179,7 @@ function Login({ setToken }) {
                         </InputLabel>
                         <OutlinedInput
                           id='password'
+                          placeholder='Password'
                           type={showPassword ? 'text' : 'password'}
                           onChange={onChange}
                           value={value}
@@ -208,22 +211,22 @@ function Login({ setToken }) {
                     )}
                   />
                 </Grid>
-                <Grid item xs={6}>
+                {/* <Grid item xs={6}>
                   <FormControlLabel
                     control={
                       <Checkbox value='allowRememberMe' color='primary' />
                     }
                     label='Remember me'
                   />
-                </Grid>
-                <Grid item xs={6} className={cx('forgot-password')}>
+                </Grid> */}
+                {/* <Grid item xs={6} className={cx('forgot-password')}>
                   <Link
                     to=''
                     onClick={() => alert('Chức năng đang phát triển')}
                   >
                     Forgot password ?
                   </Link>
-                </Grid>
+                </Grid> */}
               </Grid>
               <Button
                 type='button'

@@ -24,6 +24,9 @@ import ProductForm from '~/pages/Product/ProductForm';
 import Staff from '~/pages/Staff';
 import StaffForm from '~/pages/Staff/StaffForm';
 
+// Profile
+import Profile from '~/pages/Profile';
+
 // routes need login
 export const privateRoutes = [
   { path: config.routes.logout, component: Logout, layout: null },
@@ -52,6 +55,9 @@ export const privateRoutes = [
   { path: config.routes.staff, component: Staff },
   { path: config.staff.add, component: StaffForm },
   { path: config.staff.view, component: StaffForm },
+
+  //Profile
+  { path: config.routes.profile, component: Profile },
 ];
 
 //routes not login
