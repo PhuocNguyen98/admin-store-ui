@@ -152,6 +152,7 @@ function CategoryForm() {
         setValue('categoryName', res.data[0].name);
         setValue('categorySlug', res.data[0].slug);
         setValue('categoryStatus', res.data[0].is_status);
+        setValue('categoryDisplay', res.data[0].is_display);
         setFiles([res.data[0].thumbnail ?? []]);
       } else {
         toast.error(res.message);
