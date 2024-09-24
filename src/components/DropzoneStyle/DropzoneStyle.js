@@ -59,7 +59,6 @@ function DropzoneStyle({
     });
     setFiles(newFiles);
   };
-
   return (
     <>
       <div className={cx('wrapper')}>
@@ -70,13 +69,9 @@ function DropzoneStyle({
               <p className={cx('desc')}>Drop the files here ...</p>
             ) : (
               <p className={cx('desc')}>
-                Drag drop {multiple ? 'some' : '1'} files here, or click to
-                select files <br />
+                Drag drop {multiple ? 'some' : '1'} files here, or click to select files <br />
                 {multiple && (
-                  <strong
-                    className={cx('note')}
-                    style={{ display: 'block', textAlign: 'center' }}
-                  >
+                  <strong className={cx('note')} style={{ display: 'block', textAlign: 'center' }}>
                     Unlimited number of files
                   </strong>
                 )}
@@ -96,10 +91,7 @@ function DropzoneStyle({
                       URL.revokeObjectURL(file);
                     }}
                   />
-                  <span
-                    className={cx('thumb-detele')}
-                    onClick={() => removeThumb(file)}
-                  >
+                  <span className={cx('thumb-detele')} onClick={() => removeThumb(file)}>
                     &times;
                   </span>
                 </div>
