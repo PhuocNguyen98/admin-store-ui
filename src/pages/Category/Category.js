@@ -127,13 +127,12 @@ function Category() {
         setIsLoading(false);
       }
     } catch (error) {
-      console.log(error.messages);
+      toast.error(error.message);
     }
   };
 
   // Handle Submit
   const onSubmit = handleSubmit(async (data) => {
-    console.log(data);
     try {
       const res = await quickUpdateCategoryApi(data);
       if (res?.status === 200) {

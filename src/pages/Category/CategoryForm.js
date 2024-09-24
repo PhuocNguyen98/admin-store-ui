@@ -2,6 +2,8 @@ import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
+
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 
 import { useForm } from 'react-hook-form';
@@ -21,14 +23,6 @@ import TypographyStyle from '~/components/FormStyle/TypographyStyle';
 
 import { convertSlug } from '~/utils/convertSlug';
 import { getCategoryByIdApi, updateCategoryApi, addCategoryApi } from '~/api/categoryApi';
-import images from '~/assets/img';
-
-import classnames from 'classnames/bind';
-import styles from './Category.module.scss';
-
-import CircularProgress from '@mui/material/CircularProgress';
-
-const cx = classnames.bind(styles);
 
 const schemaCategory = yup.object().shape({
   categoryName: yup.string().required('Please enter a category name'),
@@ -64,8 +58,7 @@ const optionsDisplay = [
 function CategoryForm() {
   const { id } = useParams(); // Get id
   const [data, setData] = useState([]); // Save data after call API( by id)
-  const [files, setFiles] = useState([]); // Save image new
-  const [filesOld, setFilesOld] = useState([]); // Save image old
+  const [files, setFiles] = useState([]); // Save image
   const [isSuccess, setIsSuccess] = useState(false);
 
   const { handleSubmit, control, watch, setValue, reset, clearErrors } = useForm({
@@ -115,7 +108,7 @@ function CategoryForm() {
     const formData = handleFormData(data);
     try {
       const res = await addCategoryApi(formData);
-      if (res?.status === 200) {
+      if (res?.status === 201) {
         toast.success(res?.message);
         reset({
           categoryName: '',
@@ -286,7 +279,7 @@ function CategoryForm() {
 
           <Box>
             <TypographyStyle component='label' variant='h5' htmlFor='categoryImage'>
-              Category image
+              Category thumbnail
             </TypographyStyle>
 
             <DropzoneStyle
@@ -307,7 +300,14 @@ function CategoryForm() {
             disabled={isSuccess}
             onClick={() => handleEdit()}
           >
-            Update category
+            {isSuccess ? (
+              <>
+                <CircularProgress size='14px' sx={{ mr: 1 }} />
+                Update category...
+              </>
+            ) : (
+              'Update category'
+            )}
           </ButtonStyle>
         ) : (
           <ButtonStyle
@@ -317,7 +317,14 @@ function CategoryForm() {
             disabled={isSuccess}
             onClick={() => handleAdd()}
           >
-            Create category
+            {isSuccess ? (
+              <>
+                <CircularProgress size='14px' sx={{ mr: 1 }} />
+                Create category...
+              </>
+            ) : (
+              'Create category'
+            )}
           </ButtonStyle>
         )}
       </Paper>
