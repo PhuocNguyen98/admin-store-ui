@@ -14,7 +14,6 @@ import classnames from 'classnames/bind';
 import styles from './TableStyle.module.scss';
 
 import { NumericFormat } from 'react-number-format';
-
 import { Controller } from 'react-hook-form';
 
 const cx = classnames.bind(styles);
@@ -48,6 +47,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           fontSize: '1.4rem',
+          minWidth: '100px',
         },
       },
     },
@@ -84,12 +84,7 @@ function TableBodyStyle({ columns, tableData, actions, control, setValue }) {
             {column.displayType.map((col) => {
               if (col.value === data) {
                 return (
-                  <Chip
-                    key={col.value}
-                    label={col.title}
-                    color={col.color}
-                    variant='outlined'
-                  />
+                  <Chip key={col.value} label={col.title} color={col.color} variant='outlined' />
                 );
               }
               return '';
@@ -113,12 +108,7 @@ function TableBodyStyle({ columns, tableData, actions, control, setValue }) {
       case 'currency': {
         return (
           <TableCell key={column.accessor}>
-            <NumericFormat
-              displayType='text'
-              value={data}
-              suffix=' vnd'
-              thousandSeparator
-            />
+            <NumericFormat displayType='text' value={data} suffix=' vnd' thousandSeparator />
           </TableCell>
         );
       }
@@ -164,9 +154,7 @@ function TableBodyStyle({ columns, tableData, actions, control, setValue }) {
         key={column.accessor}
         control={control}
         name={name}
-        render={({ field: { value, onChange } }) =>
-          renderBasic(column, data, id, value, onChange)
-        }
+        render={({ field: { value, onChange } }) => renderBasic(column, data, id, value, onChange)}
       />
     );
   };
@@ -193,12 +181,12 @@ function TableBodyStyle({ columns, tableData, actions, control, setValue }) {
   return (
     <ThemeProvider theme={theme}>
       <TableBody>
-        {tableData && tableData.length > 0 ? (
+        {tableData.length > 0 ? (
           renderTableBody()
         ) : (
           <TableRow>
             <TableCell colSpan={5} sx={{ textAlign: 'center' }}>
-              No records found
+              No data
             </TableCell>
           </TableRow>
         )}

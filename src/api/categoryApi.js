@@ -1,27 +1,7 @@
 import { baseApi } from '~/utils/axios';
 
-export const getCategoryApi = async (order, sort, page, limit, search) => {
-  let url = `/category`;
-
-  if (order) {
-    url += `?order=${order}`;
-  }
-  if (sort) {
-    url += `&sort=${sort}`;
-  }
-  if (page) {
-    url += `&page=${page}`;
-  }
-  if (limit) {
-    url += `&limit=${limit}`;
-  }
-  if (search) {
-    url += `&search=${search}`;
-  }
-  if (search) {
-    url += `&search=${search}`;
-  }
-
+export const getCategoryApi = async (search, sort, order, page, limit) => {
+  let url = `/category?search=${search}&sort=${sort}&order=${order}&page=${page}&limit=${limit}`;
   const res = await baseApi.get(url);
   return res;
 };
@@ -38,5 +18,10 @@ export const addCategoryApi = async (data) => {
 
 export const updateCategoryApi = async (id, data) => {
   const res = await baseApi.put(`/category/${id}`, data);
+  return res;
+};
+
+export const quickUpdateCategoryApi = async (data) => {
+  const res = await baseApi.put(`/category`, data);
   return res;
 };

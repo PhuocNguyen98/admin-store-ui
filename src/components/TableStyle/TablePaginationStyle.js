@@ -41,19 +41,16 @@ const themeTablePagination = createTheme({
 });
 
 function TablePaginationStyle({
-  totalRowsValue,
-  rowsPerPageValue,
+  page,
+  count,
+  rowsPerPage,
   rowsPerPageOptions,
   handleChangePage,
   handleChangeRowsPerPage,
 }) {
-  const [page, setPage] = useState(0); // Chỉ mục của số trang hiện tại
-  const [totalRows, setTotalRows] = useState(-1); //Tổng số hàng
-  const [rowsPerPage, setRowsPerPage] = useState(5); // Số lượng hàng trên 1 trang
-
+  const [totalRowsValue, setTotalRows] = useState(0);
   const onChangePage = (event, newPage) => {
-    setPage(newPage);
-    handleChangePage(newPage, rowsPerPage);
+    handleChangePage(newPage);
   };
 
   const onChangeRowsPerPage = (event) => {
@@ -61,26 +58,20 @@ function TablePaginationStyle({
     let newPage = page;
 
     // Kiểm tra số lượng hàng hiển thị vừa thay đổi so với số tổng số hàng có thể phân trang
-    if (newRowsPerPage > totalRows || newRowsPerPage === totalRows) {
+    if (newRowsPerPage > totalRowsValue || newRowsPerPage === totalRowsValue) {
       newPage = 0;
-    } else if (totalRows % newRowsPerPage !== 0) {
-      newPage = Math.floor(totalRows / newRowsPerPage) - 1;
+    } else if (totalRowsValue % newRowsPerPage !== 0) {
+      newPage = Math.floor(totalRowsValue / newRowsPerPage) - 1;
     }
 
-    setRowsPerPage(newRowsPerPage);
-    setPage(newPage);
     handleChangeRowsPerPage(newPage, newRowsPerPage);
   };
 
   useEffect(() => {
-    if (totalRowsValue) {
-      setTotalRows(totalRowsValue);
+    if (count) {
+      setTotalRows(count);
     }
-
-    if (rowsPerPageValue) {
-      setRowsPerPage(rowsPerPageValue);
-    }
-  }, []);
+  }, [count]);
 
   return (
     <ThemeProvider theme={themeTablePagination}>
@@ -88,8 +79,8 @@ function TablePaginationStyle({
         sx={{ mt: 3 }}
         component='div'
         page={page}
-        count={totalRowsValue ? totalRowsValue : totalRows}
-        rowsPerPage={rowsPerPageValue ? rowsPerPageValue : rowsPerPage}
+        count={count}
+        rowsPerPage={rowsPerPage}
         rowsPerPageOptions={rowsPerPageOptions}
         onPageChange={onChangePage}
         onRowsPerPageChange={onChangeRowsPerPage}

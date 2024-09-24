@@ -7,7 +7,7 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import visuallyHidden from '@mui/utils/visuallyHidden';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
-import { useState, memo } from 'react';
+import { useState } from 'react';
 
 const theme = createTheme({
   components: {
@@ -31,12 +31,11 @@ const theme = createTheme({
 });
 
 function TableHeadStyle({ columns, handleSorting }) {
-  const [sortField, setSortField] = useState('');
   const [order, setOrder] = useState('asc');
+  const [sortField, setSortField] = useState('');
 
   const handleSortingChange = (accessor) => {
-    const sortOrder =
-      accessor === sortField && order === 'asc' ? 'desc' : 'asc';
+    const sortOrder = accessor === sortField && order === 'asc' ? 'desc' : 'asc';
     setSortField(accessor);
     setOrder(sortOrder);
     handleSorting(accessor, sortOrder);
@@ -50,25 +49,17 @@ function TableHeadStyle({ columns, handleSorting }) {
             <TableCell
               align='center'
               key={col.accessor}
-              onClick={
-                col.sortTable ? () => handleSortingChange(col.accessor) : null
-              }
+              onClick={col.sortTable ? () => handleSortingChange(col.accessor) : null}
             >
               {col.label}
               {col.sortTable ? (
                 <TableSortLabel
                   active={sortField === col.accessor}
-                  direction={
-                    sortField === col.accessor || col?.sortbyOrder
-                      ? order
-                      : 'asc'
-                  }
+                  direction={sortField === col.accessor || col?.sortbyOrder ? order : 'asc'}
                 >
                   {sortField === col.accessor ? (
                     <Box component='span' sx={visuallyHidden}>
-                      {order === 'asc'
-                        ? 'sorted ascending'
-                        : 'sorted descending'}
+                      {order === 'asc' ? 'sorted ascending' : 'sorted descending'}
                     </Box>
                   ) : null}
                 </TableSortLabel>
@@ -87,4 +78,4 @@ function TableHeadStyle({ columns, handleSorting }) {
   );
 }
 
-export default memo(TableHeadStyle);
+export default TableHeadStyle;

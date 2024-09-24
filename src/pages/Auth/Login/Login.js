@@ -106,12 +106,12 @@ function Login({ setToken }) {
 
   const onSubmit = handleSubmit(async (data) => {
     const res = await loginStaff(data);
-    if (res?.data?.status === 200) {
+    if (res?.status === 200) {
       toast.success('Login success');
-      setToken(res.data?.access_token);
+      setToken(res?.access_token);
       navigate(config.routes.dashboard, { replace: true });
     } else {
-      toast.error(res?.data?.message ?? 'error');
+      toast.error(res?.message ?? 'error');
     }
   });
 
@@ -143,10 +143,7 @@ function Login({ setToken }) {
                   <Controller
                     control={control}
                     name='username'
-                    render={({
-                      field: { onChange, value },
-                      fieldState: { error },
-                    }) => (
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
                       <TextField
                         name='username'
                         fullWidth
@@ -165,18 +162,9 @@ function Login({ setToken }) {
                   <Controller
                     control={control}
                     name='password'
-                    render={({
-                      field: { onChange, value },
-                      fieldState: { error },
-                    }) => (
-                      <FormControl
-                        error={error ? true : false}
-                        fullWidth
-                        variant='outlined'
-                      >
-                        <InputLabel htmlFor='outlined-adornment-password'>
-                          Password
-                        </InputLabel>
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                      <FormControl error={error ? true : false} fullWidth variant='outlined'>
+                        <InputLabel htmlFor='outlined-adornment-password'>Password</InputLabel>
                         <OutlinedInput
                           id='password'
                           placeholder='Password'
@@ -190,11 +178,7 @@ function Login({ setToken }) {
                                 onMouseDown={(e) => handleMouseDownPassword(e)}
                                 edge='end'
                               >
-                                {showPassword ? (
-                                  <VisibilityOff />
-                                ) : (
-                                  <Visibility />
-                                )}
+                                {showPassword ? <VisibilityOff /> : <Visibility />}
                               </IconButton>
                             </InputAdornment>
                           }

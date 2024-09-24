@@ -20,27 +20,26 @@ import TextFieldStyle from '~/components/FormStyle/TextFieldStyle';
 import TypographyStyle from '~/components/FormStyle/TypographyStyle';
 
 import { convertSlug } from '~/utils/convertSlug';
-import {
-  getCategoryByIdApi,
-  updateCategoryApi,
-  addCategoryApi,
-} from '~/api/categoryApi';
+import { getCategoryByIdApi, updateCategoryApi, addCategoryApi } from '~/api/categoryApi';
 import images from '~/assets/img';
 
 import classnames from 'classnames/bind';
 import styles from './Category.module.scss';
 
+import CircularProgress from '@mui/material/CircularProgress';
+
 const cx = classnames.bind(styles);
 
 const schemaCategory = yup.object().shape({
-  categoryName: yup.string().required('Vui lòng nhập tên danh mục'),
-  categorySlug: yup.string().required('Nhấn nút Generate slug để tạo slug'),
+  categoryName: yup.string().required('Please enter a category name'),
+  categorySlug: yup.string().required('Click the generate slug button to create the slug'),
   categoryStatus: yup.string(),
+  categoryDisplay: yup.string(),
   categoryImage: yup.array(),
 });
 
 // Options data display of SelectStyle componnent
-const options = [
+const optionsStatus = [
   {
     value: 0,
     title: 'Ngừng kinh doanh',
@@ -51,6 +50,17 @@ const options = [
   },
 ];
 
+const optionsDisplay = [
+  {
+    value: 0,
+    title: 'Ẩn',
+  },
+  {
+    value: 1,
+    title: 'Hiển thị',
+  },
+];
+
 function CategoryForm() {
   const { id } = useParams(); // Get id
   const [data, setData] = useState([]); // Save data after call API( by id)
@@ -58,11 +68,12 @@ function CategoryForm() {
   const [filesOld, setFilesOld] = useState([]); // Save image old
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const { handleSubmit, control, watch, setValue, clearErrors } = useForm({
+  const { handleSubmit, control, watch, setValue, reset, clearErrors } = useForm({
     defaultValues: {
       categoryName: '',
       categorySlug: '',
-      categoryStatus: 0,
+      categoryStatus: 1,
+      categoryDisplay: 0,
       categoryImage: [],
     },
     resolver: yupResolver(schemaCategory),
@@ -87,6 +98,9 @@ function CategoryForm() {
     if (data?.categoryStatus) {
       formData.append('categoryStatus', data.categoryStatus);
     }
+    if (data?.categoryDisplay) {
+      formData.append('categoryDisplay', data.categoryDisplay);
+    }
     if (!!data.categoryImage[0]) {
       formData.append('categoryImage', data.categoryImage[0]);
     } else {
@@ -101,12 +115,17 @@ function CategoryForm() {
     const formData = handleFormData(data);
     try {
       const res = await addCategoryApi(formData);
-      toast.success(res.message);
-      setValue('categoryName', '');
-      setValue('categorySlug', '');
-      setValue('categoryImage', files);
-      setFiles([]);
-      setIsSuccess(false);
+      if (res?.status === 200) {
+        toast.success(res?.message);
+        reset({
+          categoryName: '',
+          categorySlug: '',
+        });
+        setFiles([]);
+        setIsSuccess(false);
+      } else {
+        toast.error(res?.message);
+      }
     } catch (error) {
       setIsSuccess(false);
       toast.error(error.message);
@@ -119,8 +138,12 @@ function CategoryForm() {
     const formData = handleFormData(data);
     try {
       const res = await updateCategoryApi(id, formData);
-      toast.success(res.message);
-      setIsSuccess(false);
+      if (res?.status === 200) {
+        toast.success(res.message);
+        setIsSuccess(false);
+      } else {
+        toast.error(res.message);
+      }
     } catch (error) {
       setIsSuccess(false);
       toast.error(error.message);
@@ -131,33 +154,18 @@ function CategoryForm() {
   const getDataById = async (id) => {
     try {
       const res = await getCategoryByIdApi(id);
-      if (res) {
+      if (res?.status === 200 && res?.data) {
         setData(res.data);
         setValue('categoryName', res.data[0].name);
         setValue('categorySlug', res.data[0].slug);
         setValue('categoryStatus', res.data[0].is_status);
-        setFilesOld([res.data[0].thumbnail ?? []]);
+        setFiles([res.data[0].thumbnail ?? []]);
+      } else {
+        toast.error(res.message);
       }
     } catch (error) {
       toast.error(error.message);
     }
-  };
-
-  const onErrorImg = (e) => {
-    e.target.src = images.imgPlacehoder;
-  };
-
-  // Render image after get data
-  const renderListImage = () => {
-    return (
-      <ul className={cx('list-image')}>
-        {filesOld.map((file, index) => (
-          <li key={index} className={cx('item-img')}>
-            <img alt='' src={file} onError={(e) => onErrorImg(e)} />
-          </li>
-        ))}
-      </ul>
-    );
   };
 
   useEffect(() => {
@@ -194,10 +202,7 @@ function CategoryForm() {
             paddingBottom: 1,
           }}
         >
-          {data.length > 0
-            ? 'Edit category for the system'
-            : 'Create new category for the system'}
-          {/* Create new category for the system */}
+          {data.length > 0 ? 'Edit category for the system' : 'Create new category for the system'}
         </Typography>
       </Box>
       <Divider />
@@ -213,11 +218,7 @@ function CategoryForm() {
             >
               Category name
             </TypographyStyle>
-            <TextFieldStyle
-              control={control}
-              name='categoryName'
-              placeholder='Category name'
-            />
+            <TextFieldStyle control={control} name='categoryName' placeholder='Category name' />
           </Box>
 
           <Box
@@ -233,7 +234,7 @@ function CategoryForm() {
                 variant='h5'
                 htmlFor='categorySlug'
                 isRequired={true}
-                comment='Nhấn nút Generate để tạo Slug'
+                comment='Click the generate slug button to create the slug'
               >
                 Category slug
               </TypographyStyle>
@@ -258,37 +259,35 @@ function CategoryForm() {
           </Box>
 
           {data.length > 0 ? (
-            <Box mb={3}>
-              <TypographyStyle
-                component='label'
-                htmlFor='categoryStatus'
-                variant='h5'
-              >
-                Category status
-              </TypographyStyle>
-              <SelectStyle
-                control={control}
-                name='categoryStatus'
-                options={options}
-              ></SelectStyle>
-            </Box>
+            <>
+              <Box mb={3}>
+                <TypographyStyle component='label' htmlFor='categoryStatus' variant='h5'>
+                  Category status
+                </TypographyStyle>
+                <SelectStyle
+                  control={control}
+                  name='categoryStatus'
+                  options={optionsStatus}
+                ></SelectStyle>
+              </Box>
+
+              <Box mb={3}>
+                <TypographyStyle component='label' htmlFor='categoryDisplay' variant='h5'>
+                  Category display
+                </TypographyStyle>
+                <SelectStyle
+                  control={control}
+                  name='categoryDisplay'
+                  options={optionsDisplay}
+                ></SelectStyle>
+              </Box>
+            </>
           ) : null}
 
           <Box>
-            <TypographyStyle
-              component='label'
-              variant='h5'
-              htmlFor='categoryImage'
-            >
+            <TypographyStyle component='label' variant='h5' htmlFor='categoryImage'>
               Category image
             </TypographyStyle>
-
-            {data.length > 0 ? (
-              <Box display='flex' alignItems='center' flexWrap='wrap' ml={3}>
-                <span>Image Old: </span>
-                {filesOld.length > 0 ? renderListImage() : null}
-              </Box>
-            ) : null}
 
             <DropzoneStyle
               control={control}
