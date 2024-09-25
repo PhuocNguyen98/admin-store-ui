@@ -1,43 +1,35 @@
 import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
+import InputAdornment from '@mui/material/InputAdornment';
+import CircularProgress from '@mui/material/CircularProgress';
+
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 
 import { useForm } from 'react-hook-form';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
+import dayjs from 'dayjs';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { toast, ToastContainer } from 'react-toastify';
 
+import SelectStyle from '~/components/SelectStyle';
 import ButtonStyle from '~/components/ButtonStyle';
+import CKEditorStyle from '~/components/CKEditorStyle';
 import DropzoneStyle from '~/components/DropzoneStyle';
+import DatePickerStyle from '~/components/DatePickerStyle';
 import BreadcrumbStyle from '~/components/BreadcrumbStyle';
 import TextFieldStyle from '~/components/FormStyle/TextFieldStyle';
 import TypographyStyle from '~/components/FormStyle/TypographyStyle';
-
-import { convertSlug } from '~/utils/convertSlug';
-import {
-  getDiscountByIdApi,
-  updateDiscountApi,
-  addDiscountApi,
-} from '~/api/discountApi';
-import images from '~/assets/img';
-
-import classnames from 'classnames/bind';
-import styles from './Discount.module.scss';
-
-import { Grid } from '@mui/material';
-import CKEditorStyle from '~/components/CKEditorStyle';
-import { InputAdornment } from '@mui/material';
 import FormControlStyle from '~/components/FormStyle/FormControlStyle';
 import OutlinedInputStyle from '~/components/FormStyle/OutlinedInputStyle';
-import DatePickerStyle from '~/components/DatePickerStyle';
-import dayjs from 'dayjs';
 
-const cx = classnames.bind(styles);
+import { convertSlug } from '~/utils/convertSlug';
+import { getDiscountByIdApi, updateDiscountApi, addDiscountApi } from '~/api/discountApi';
 
 const schemaDiscount = yup.object().shape({
   discountName: yup.string().required('Vui lòng nhập tên khuyến mãi'),
@@ -54,19 +46,30 @@ const schemaDiscount = yup.object().shape({
     .when(
       'discountStartTime',
       (discountStartTime, schema) =>
-        discountStartTime &&
-        schema.min(discountStartTime, 'Vui lòng kiểm tra lại ngày kết thúc'),
+        discountStartTime && schema.min(discountStartTime, 'Vui lòng kiểm tra lại ngày kết thúc'),
     )
     .required('Vui lòng chọn ngày kết thúc'),
   discountDescription: yup.string(),
+  discountStatus: yup.string(),
   discountImage: yup.array(),
 });
+
+// Options data display of SelectStyle componnent
+const optionsStatus = [
+  {
+    value: 0,
+    title: 'Chưa áp dụng',
+  },
+  {
+    value: 1,
+    title: 'Đang áp dụng',
+  },
+];
 
 function DiscountForm() {
   const { id } = useParams(); // Get id
   const [data, setData] = useState([]); // Save data after call API( by id)
-  const [files, setFiles] = useState([]); // Save image new
-  const [filesOld, setFilesOld] = useState([]); // Save image old
+  const [files, setFiles] = useState([]); // Save image
   const [isSuccess, setIsSuccess] = useState(false);
   const [textValue, setTextValue] = useState(''); // Save text CKEditor
 
@@ -78,6 +81,7 @@ function DiscountForm() {
       discountStartTime: dayjs(),
       discountEndTime: null,
       discountDescription: '',
+      discountStatus: 0,
       discountImage: [],
     },
     resolver: yupResolver(schemaDiscount),
@@ -103,6 +107,7 @@ function DiscountForm() {
     formData.append('discountStartTime', data.discountStartTime);
     formData.append('discountEndTime', data.discountEndTime);
     formData.append('discountDescription', data.discountDescription);
+    formData.append('discountStatus', data.discountStatus);
     if (!!data.discountImage[0]) {
       formData.append('discountImage', data.discountImage[0]);
     } else {
@@ -113,21 +118,23 @@ function DiscountForm() {
 
   // Handle click add submit
   const handleAdd = handleSubmit(async (data) => {
-    handleFormData(data);
     setIsSuccess(true);
     const formData = handleFormData(data);
     try {
       const res = await addDiscountApi(formData);
-      toast.success(res.message);
-      setValue('discountName', '');
-      setValue('discountSlug', '');
-      setValue('discountPercent', 0);
-      setValue('discountStartTime', dayjs());
-      setValue('discountEndTime', null);
-      setValue('supplierImage', files);
-      setValue('discountDescription', '');
-      setTextValue('');
-      setFiles([]);
+      if (res?.status === 201) {
+        toast.success(res?.message);
+        setValue('discountName', '');
+        setValue('discountSlug', '');
+        setValue('discountPercent', 0);
+        setValue('discountStartTime', dayjs());
+        setValue('discountEndTime', null);
+        setValue('discountDescription', '');
+        setTextValue('');
+        setFiles([]);
+      } else {
+        toast.error(res?.message);
+      }
       setIsSuccess(false);
     } catch (error) {
       setIsSuccess(false);
@@ -141,7 +148,7 @@ function DiscountForm() {
     const formData = handleFormData(data);
     try {
       const res = await updateDiscountApi(id, formData);
-      toast.success(res.message);
+      res?.status === 200 ? toast.success(res.message) : toast.error(res.message);
       setIsSuccess(false);
     } catch (error) {
       setIsSuccess(false);
@@ -153,40 +160,21 @@ function DiscountForm() {
   const getDataById = async (id) => {
     try {
       const res = await getDiscountByIdApi(id);
-      if (res) {
+      if (res?.status === 200 && res?.data) {
         setData(res.data);
-        setValue('discountName', res.data[0].name);
-        setValue('discountSlug', res.data[0].slug);
-        setValue('discountPercent', res.data[0].percent);
-        setValue(
-          'discountStartTime',
-          dayjs(res.data[0].start_time, 'DD-MM-YYYY'),
-        );
-        setValue('discountEndTime', dayjs(res.data[0].end_time, 'DD-MM-YYYY'));
-        setValue('discountDescription', res.data[0].description);
-        setFilesOld([res.data[0].thumbnail ?? []]);
-        setTextValue(res.data[0].description);
+        setValue('discountName', res.data[0]?.name);
+        setValue('discountSlug', res.data[0]?.slug);
+        setValue('discountPercent', res.data[0]?.percent);
+        setValue('discountStartTime', dayjs(res.data[0]?.start_time, 'DD-MM-YYYY'));
+        setValue('discountEndTime', dayjs(res.data[0]?.end_time, 'DD-MM-YYYY'));
+        setValue('discountStatus', res.data[0]?.is_status);
+        setValue('discountDescription', res.data[0]?.description);
+        setFiles([res.data[0]?.thumbnail ?? []]);
+        setTextValue(res.data[0]?.description);
+      } else {
+        toast.error(res?.message);
       }
-    } catch (error) {
-      toast.error(error.message);
-    }
-  };
-
-  const onErrorImg = (e) => {
-    e.target.src = images.imgPlacehoder;
-  };
-
-  // Render image after get data
-  const renderListImage = () => {
-    return (
-      <ul className={cx('list-image')}>
-        {filesOld.map((file, index) => (
-          <li key={index} className={cx('item-img')}>
-            <img alt='' src={file} onError={(e) => onErrorImg(e)} />
-          </li>
-        ))}
-      </ul>
-    );
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -223,9 +211,7 @@ function DiscountForm() {
             paddingBottom: 1,
           }}
         >
-          {data.length > 0
-            ? 'Edit discount for the system'
-            : 'Create new discount for the system'}
+          {data.length > 0 ? 'Edit discount for the system' : 'Create new discount for the system'}
         </Typography>
       </Box>
       <Divider />
@@ -241,11 +227,7 @@ function DiscountForm() {
             >
               Discount name
             </TypographyStyle>
-            <TextFieldStyle
-              control={control}
-              name='discountName'
-              placeholder='Discount name'
-            />
+            <TextFieldStyle control={control} name='discountName' placeholder='Discount name' />
           </Grid>
 
           <Grid item xs={12} xl={6}>
@@ -287,7 +269,7 @@ function DiscountForm() {
             </Box>
           </Grid>
 
-          <Grid item xs={12} xl={4}>
+          <Grid item xs={12} xl={data.length > 0 ? 3 : 4}>
             <TypographyStyle
               component='label'
               htmlFor='discountPercent'
@@ -302,15 +284,13 @@ function DiscountForm() {
               <OutlinedInputStyle
                 control={control}
                 name='discountPercent'
-                endAdornment={
-                  <InputAdornment position='start'>%</InputAdornment>
-                }
+                endAdornment={<InputAdornment position='start'>%</InputAdornment>}
                 placeholder='Discount percent'
               />
             </FormControlStyle>
           </Grid>
 
-          <Grid item xs={12} xl={4}>
+          <Grid item xs={12} xl={data.length > 0 ? 3 : 4}>
             <TypographyStyle
               component='label'
               htmlFor='discountStartTime'
@@ -324,7 +304,7 @@ function DiscountForm() {
             <DatePickerStyle control={control} name='discountStartTime' />
           </Grid>
 
-          <Grid item xs={12} xl={4}>
+          <Grid item xs={12} xl={data.length > 0 ? 3 : 4}>
             <TypographyStyle
               component='label'
               htmlFor='discountEndTime'
@@ -338,6 +318,19 @@ function DiscountForm() {
             <DatePickerStyle control={control} name='discountEndTime' />
           </Grid>
 
+          {data.length > 0 ? (
+            <Grid item xs={12} xl={3}>
+              <TypographyStyle component='label' htmlFor='discountStatus' variant='h5'>
+                Discount status
+              </TypographyStyle>
+              <SelectStyle
+                control={control}
+                name='discountStatus'
+                options={optionsStatus}
+              ></SelectStyle>
+            </Grid>
+          ) : null}
+
           <Grid item xs={12}>
             <TypographyStyle
               component='label'
@@ -347,13 +340,6 @@ function DiscountForm() {
             >
               Discount thumbnail
             </TypographyStyle>
-
-            {data.length > 0 ? (
-              <Box display='flex' alignItems='center' flexWrap='wrap' ml={3}>
-                <span>Thumbnail Old: </span>
-                {filesOld.length > 0 ? renderListImage() : null}
-              </Box>
-            ) : null}
 
             <DropzoneStyle
               control={control}
@@ -391,7 +377,14 @@ function DiscountForm() {
             disabled={isSuccess}
             onClick={() => handleEdit()}
           >
-            Update discount
+            {isSuccess ? (
+              <>
+                <CircularProgress size='14px' sx={{ mr: 1 }} />
+                Update discount...
+              </>
+            ) : (
+              'Update discount'
+            )}
           </ButtonStyle>
         ) : (
           <ButtonStyle
@@ -401,7 +394,14 @@ function DiscountForm() {
             disabled={isSuccess}
             onClick={() => handleAdd()}
           >
-            Create discount
+            {isSuccess ? (
+              <>
+                <CircularProgress size='14px' sx={{ mr: 1 }} />
+                Create discount...
+              </>
+            ) : (
+              'Create discount'
+            )}
           </ButtonStyle>
         )}
       </Paper>

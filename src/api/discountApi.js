@@ -1,23 +1,7 @@
 import { baseApi } from '~/utils/axios';
 
-export const getDiscountApi = async (order, sort, page, limit, search) => {
-  let url = `/discount`;
-
-  if (order) {
-    url += `?order=${order}`;
-  }
-  if (sort) {
-    url += `&sort=${sort}`;
-  }
-  if (page) {
-    url += `&page=${page}`;
-  }
-  if (limit) {
-    url += `&limit=${limit}`;
-  }
-  if (search) {
-    url += `&search=${search}`;
-  }
+export const getDiscountApi = async (search, sort, order, page, limit) => {
+  let url = `/discount?search=${search}&sort=${sort}&order=${order}&page=${page}&limit=${limit}`;
   const res = await baseApi.get(url);
   return res;
 };
@@ -37,7 +21,7 @@ export const updateDiscountApi = async (id, data) => {
   return res;
 };
 
-export const updateDiscountStatusApi = async (data) => {
+export const quickUpdateDiscountApi = async (data) => {
   const res = await baseApi.put(`/discount`, data);
   return res;
 };
