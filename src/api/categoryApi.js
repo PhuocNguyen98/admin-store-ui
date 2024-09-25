@@ -1,5 +1,11 @@
 import { baseApi } from '~/utils/axios';
 
+export const getAllCategoryApi = async () => {
+  let url = `/category`;
+  const res = await baseApi.get(url);
+  return res;
+};
+
 export const getCategoryApi = async (search, sort, order, page, limit) => {
   let url = `/category?search=${search}&sort=${sort}&order=${order}&page=${page}&limit=${limit}`;
   const res = await baseApi.get(url);

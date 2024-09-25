@@ -1,10 +1,7 @@
 import { baseApi } from '~/utils/axios';
 
-export const getProductApi = async (order, sort, page, limit, search) => {
-  let url = `/product?order=${order}&sort=${sort}&page=${page}&limit=${limit}`;
-  if (search) {
-    url += `&search=${search}`;
-  }
+export const getProductApi = async (search, sort, order, page, limit) => {
+  let url = `/product?search=${search}&sort=${sort}&order=${order}&page=${page}&limit=${limit}`;
   const res = await baseApi.get(url);
   return res;
 };

@@ -4,6 +4,7 @@ import Paper from '@mui/material/Paper';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import { useForm } from 'react-hook-form';
 import { useState, useEffect } from 'react';
@@ -23,19 +24,15 @@ import TextFieldStyle from '~/components/FormStyle/TextFieldStyle';
 import TypographyStyle from '~/components/FormStyle/TypographyStyle';
 
 import { convertSlug } from '~/utils/convertSlug';
-import { getSupplierApi } from '~/api/supplierApi';
-import { getCategoryApi } from '~/api/categoryApi';
-import { getDiscountApi } from '~/api/discountApi';
-import {
-  getProductByIdApi,
-  addProductApi,
-  updateProductApi,
-} from '~/api/productApi';
+import { getAllSupplierApi } from '~/api/supplierApi';
+import { getAllCategoryApi } from '~/api/categoryApi';
+import { getAllDiscountApi } from '~/api/discountApi';
+import { getProductByIdApi, addProductApi, updateProductApi } from '~/api/productApi';
 
 const schemaProduct = yup.object().shape({
   productName: yup.string().required('Vui lòng nhập tên sản phẩm'),
   productSlug: yup.string().required('Nhấn nút Generate slug để tạo slug'),
-  productSku: yup.string().required('Vui lòng nhập SKU của sản phẩm'),
+  productSku: yup.string(),
   productPrice: yup
     .number()
     .typeError('Vui lòng kiểm tra lại giá của sản phẩm')
@@ -45,15 +42,14 @@ const schemaProduct = yup.object().shape({
     .number()
     .typeError('Vui lòng kiểm tra lại số lượng')
     .integer('Giá trị phải là số nguyên')
-    .positive('Giá trị phải là số dương'),
+    .positive('Giá trị phải là số dương')
+    .min(0),
   productSupplier: yup.number().typeError('Vui lòng chọn nhà cung cấp'),
-  productCategory: yup
-    .number()
-    .typeError('Vui lòng chọn danh mục cho sản phẩm'),
+  productCategory: yup.number().typeError('Vui lòng chọn danh mục cho sản phẩm'),
   productDiscount: yup
     .number()
     .nullable()
-    .transform((value, original) => (original === '' ? null : value)),
+    .transform((value, original) => (original === '' ? 0 : value)),
   productStatus: yup.string(),
   productDisplay: yup.string(),
   productThumbnail: yup.array(),
@@ -124,18 +120,18 @@ function ProductForm() {
     formData.append('productSlug', data.productSlug);
     formData.append('productSku', data.productSku);
     formData.append('productPrice', data.productPrice);
-    formData.append('productInventory', data.productInventory);
     formData.append('productSupplier', data.productSupplier);
     formData.append('productCategory', data.productCategory);
     formData.append('productDiscount', data.productDiscount);
     formData.append('productSpecifications', data.productSpecifications);
     formData.append('productDescription', data.productDescription);
+    data.productInventory
+      ? formData.append('productInventory', data.productInventory)
+      : formData.append('productInventory', 0);
 
-    if (!!data.productThumbnail[0]) {
-      formData.append('productThumbnail', data.productThumbnail[0]);
-    } else {
-      formData.append('productThumbnail', []);
-    }
+    data.productThumbnail[0]
+      ? formData.append('productThumbnail', data.productThumbnail[0])
+      : formData.append('productThumbnail', []);
 
     if (data.productImages.length > 0) {
       for (let i = 0; i < data.productImages.length; i++) {
@@ -155,22 +151,26 @@ function ProductForm() {
     const formData = handleFormData(data);
     try {
       const res = await addProductApi(formData);
-      toast.success(res.message);
-      setValue('productName', '');
-      setValue('productSlug', '');
-      setValue('productSku', '');
-      setValue('productPrice', 0);
-      setValue('productInventory', 0);
-      setValue('productSupplier', '');
-      setValue('productCategory', '');
-      setValue('productDiscount', '');
-      setValue('productSpecifications', '');
-      setValue('productDescription', '');
+      if (res?.status === 201) {
+        toast.success(res?.message);
+        setValue('productName', '');
+        setValue('productSlug', '');
+        setValue('productSku', '');
+        setValue('productPrice', 0);
+        setValue('productInventory', 0);
+        setValue('productSupplier', '');
+        setValue('productCategory', '');
+        setValue('productDiscount', '');
+        setValue('productSpecifications', '');
+        setValue('productDescription', '');
 
-      setProductDescription('');
-      setProductSpecifications('');
-      setProductThumbnail([]);
-      setProductImages([]);
+        setProductDescription('');
+        setProductSpecifications('');
+        setProductThumbnail([]);
+        setProductImages([]);
+      } else {
+        toast.error(res?.message);
+      }
       setIsSuccess(false);
     } catch (error) {
       setIsSuccess(false);
@@ -180,14 +180,19 @@ function ProductForm() {
 
   // Handle click edit submit
   const handleEdit = handleSubmit(async (data) => {
+    console.log(1);
     setIsSuccess(true);
     let formData = handleFormData(data);
     formData.append('productStatus', data.productStatus);
     formData.append('productDisplay', data.productDisplay);
     try {
       const res = await updateProductApi(id, formData);
-      toast.success(res.message);
-      getDataById(id);
+      if (res?.status === 200) {
+        toast.success(res?.message);
+        getDataById(id);
+      } else {
+        toast.error(res?.message);
+      }
       setIsSuccess(false);
     } catch (error) {
       setIsSuccess(false);
@@ -199,47 +204,48 @@ function ProductForm() {
   const getDataById = async (id) => {
     try {
       const res = await getProductByIdApi(id);
-      if (res) {
+      if (res?.status === 200 && res?.data) {
         setData(res.data);
-        setProductSpecifications(res.data[0].specifications);
-        setProductDescription(res.data[0].description);
-        setProductThumbnail([res.data[0].thumbnail ?? []]);
-        setProductImages(res.data[0].images ?? []);
-
-        setValue('productName', res.data[0].name);
-        setValue('productSlug', res.data[0].slug);
-        setValue('productSku', res.data[0].sku);
-        setValue('productPrice', res.data[0].price);
-        setValue('productInventory', res.data[0].inventory);
-        setValue('productSupplier', res.data[0].supplier_id);
-        setValue('productCategory', res.data[0].category_id);
-        setValue('productDiscount', res.data[0].discount_id);
-        setValue('productStatus', res.data[0].is_status);
-        setValue('productDisplay', res.data[0].is_display);
+        setProductSpecifications(res.data[0]?.specifications);
+        setProductDescription(res.data[0]?.description);
+        setProductThumbnail([res.data[0]?.thumbnail] ?? []);
+        setProductImages(res.data[0]?.images ?? []);
+        setValue('productName', res.data[0]?.name);
+        setValue('productSlug', res.data[0]?.slug);
+        setValue('productSku', res.data[0]?.sku);
+        setValue('productPrice', res.data[0]?.price);
+        setValue('productInventory', res.data[0]?.inventory);
+        setValue('productSupplier', res.data[0]?.supplier);
+        setValue('productCategory', res.data[0]?.category);
+        setValue('productDiscount', res.data[0]?.discount);
+        setValue('productStatus', res.data[0]?.is_status);
+        setValue('productDisplay', res.data[0]?.is_display);
+      } else {
+        toast.error(res?.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error?.message);
     }
   };
 
   // Get data select
   const getSupplierData = async () => {
     try {
-      const result = await getSupplierApi();
+      const result = await getAllSupplierApi();
       setSupplier(result.data);
     } catch (error) {}
   };
 
   const getCategoryData = async () => {
     try {
-      const result = await getCategoryApi();
+      const result = await getAllCategoryApi();
       setCategory(result.data);
     } catch (error) {}
   };
 
   const getDiscountData = async () => {
     try {
-      const result = await getDiscountApi();
+      const result = await getAllDiscountApi();
       setDiscount(result.data);
     } catch (error) {}
   };
@@ -281,9 +287,7 @@ function ProductForm() {
             paddingBottom: 1,
           }}
         >
-          {data.length > 0
-            ? 'Edit product for the system'
-            : 'Create new product for the system'}
+          {data.length > 0 ? 'Edit product for the system' : 'Create new product for the system'}
         </Typography>
       </Box>
       <Divider />
@@ -291,19 +295,10 @@ function ProductForm() {
       <Paper elevation={6} sx={{ p: '30px', mt: 3 }}>
         <Grid container spacing={3}>
           <Grid item xs={12} xl={6}>
-            <TypographyStyle
-              component='label'
-              htmlFor='productName'
-              variant='h5'
-              isRequired={true}
-            >
+            <TypographyStyle component='label' htmlFor='productName' variant='h5' isRequired={true}>
               Product name
             </TypographyStyle>
-            <TextFieldStyle
-              control={control}
-              name='productName'
-              placeholder='Product name'
-            />
+            <TextFieldStyle control={control} name='productName' placeholder='Product name' />
           </Grid>
 
           <Grid item xs={12} xl={6}>
@@ -382,11 +377,7 @@ function ProductForm() {
           </Grid>
 
           <Grid item xs={12} xl={4}>
-            <TypographyStyle
-              component='label'
-              variant='h5'
-              htmlFor='productDiscount'
-            >
+            <TypographyStyle component='label' variant='h5' htmlFor='productDiscount'>
               Product discount
             </TypographyStyle>
 
@@ -399,19 +390,10 @@ function ProductForm() {
           </Grid>
 
           <Grid item xs={12} xl={4}>
-            <TypographyStyle
-              component='label'
-              htmlFor='productSku'
-              variant='h5'
-              isRequired={true}
-            >
+            <TypographyStyle component='label' htmlFor='productSku' variant='h5' isRequired={true}>
               Product SKU
             </TypographyStyle>
-            <TextFieldStyle
-              control={control}
-              name='productSku'
-              placeholder='Product SKU'
-            />
+            <TextFieldStyle control={control} name='productSku' placeholder='Product SKU' />
           </Grid>
 
           <Grid item xs={12} xl={4}>
@@ -423,11 +405,7 @@ function ProductForm() {
             >
               Product price
             </TypographyStyle>
-            <NumericFormatStyle
-              control={control}
-              name='productPrice'
-              placeholder='Product Price'
-            />
+            <NumericFormatStyle control={control} name='productPrice' placeholder='Product Price' />
           </Grid>
 
           <Grid item xs={12} xl={4}>
@@ -565,7 +543,14 @@ function ProductForm() {
             disabled={isSuccess}
             onClick={() => handleEdit()}
           >
-            Update product
+            {isSuccess ? (
+              <>
+                <CircularProgress size='14px' sx={{ mr: 1 }} />
+                Update product...
+              </>
+            ) : (
+              'Update product'
+            )}
           </ButtonStyle>
         ) : (
           <ButtonStyle
@@ -575,7 +560,14 @@ function ProductForm() {
             disabled={isSuccess}
             onClick={() => handleAdd()}
           >
-            Create product
+            {isSuccess ? (
+              <>
+                <CircularProgress size='14px' sx={{ mr: 1 }} />
+                Create product...
+              </>
+            ) : (
+              'Create product'
+            )}
           </ButtonStyle>
         )}
       </Paper>

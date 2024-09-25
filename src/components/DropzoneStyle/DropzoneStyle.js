@@ -46,7 +46,9 @@ function DropzoneStyle({
   useEffect(() => {
     field.onChange(files);
     // Make sure to revoke the data uris to avoid memory leaks, will run on unmount
-    return () => files.forEach((file) => URL.revokeObjectURL(file));
+    return () => {
+      if (files.length > 0) files.forEach((file) => URL.revokeObjectURL(file));
+    };
   }, [files]);
 
   const removeThumb = (file) => {
@@ -59,6 +61,7 @@ function DropzoneStyle({
     });
     setFiles(newFiles);
   };
+
   return (
     <>
       <div className={cx('wrapper')}>
@@ -81,21 +84,23 @@ function DropzoneStyle({
           <h4 className={cx('title')}>Image</h4>
           {files.length > 0 && (
             <aside className={cx('thumbs-list')}>
-              {files.map((file, index) => (
-                <div key={index} className={cx('thumb-item')}>
-                  <img
-                    src={file?.preview ? file.preview : file}
-                    alt=''
-                    className={cx('thumb-img')}
-                    onLoad={() => {
-                      URL.revokeObjectURL(file);
-                    }}
-                  />
-                  <span className={cx('thumb-detele')} onClick={() => removeThumb(file)}>
-                    &times;
-                  </span>
-                </div>
-              ))}
+              {files.map((file, index) =>
+                file ? (
+                  <div key={index} className={cx('thumb-item')}>
+                    <img
+                      src={file?.preview ? file.preview : file}
+                      alt=''
+                      className={cx('thumb-img')}
+                      onLoad={() => {
+                        URL.revokeObjectURL(file);
+                      }}
+                    />
+                    <span className={cx('thumb-detele')} onClick={() => removeThumb(file)}>
+                      &times;
+                    </span>
+                  </div>
+                ) : null,
+              )}
             </aside>
           )}
         </section>

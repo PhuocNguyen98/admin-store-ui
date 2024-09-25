@@ -1,5 +1,11 @@
 import { baseApi } from '~/utils/axios';
 
+export const getAllDiscountApi = async () => {
+  let url = `/discount`;
+  const res = await baseApi.get(url);
+  return res;
+};
+
 export const getDiscountApi = async (search, sort, order, page, limit) => {
   let url = `/discount?search=${search}&sort=${sort}&order=${order}&page=${page}&limit=${limit}`;
   const res = await baseApi.get(url);
