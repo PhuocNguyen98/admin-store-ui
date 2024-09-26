@@ -6,6 +6,7 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import FormControl from '@mui/material/FormControl';
 import InputAdornment from '@mui/material/InputAdornment';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import CloseIcon from '@mui/icons-material/Close';
 import Visibility from '@mui/icons-material/Visibility';
@@ -18,7 +19,7 @@ import * as yup from 'yup';
 import { toast } from 'react-toastify';
 import { yupResolver } from '@hookform/resolvers/yup';
 
-import SelectStyle from '~/components/SelectStyle';
+// import SelectStyle from '~/components/SelectStyle';
 import TextFieldStyle from '~/components/FormStyle/TextFieldStyle';
 import TypographyStyle from '~/components/FormStyle/TypographyStyle';
 import OutlinedInputStyle from '~/components/FormStyle/OutlinedInputStyle';
@@ -30,33 +31,34 @@ import { addStaffAccountApi } from '~/api/staffApi';
 
 const cx = classname.bind(styles);
 
-const optionRoles = [
-  { title: 'Admin', value: 1 },
-  { title: 'Trưởng phòng', value: 2 },
-  { title: 'Nhân viên', value: 3 },
-];
+// const optionRoles = [
+//   { title: 'Admin', value: 1 },
+//   { title: 'Nhân viên', value: 2 },
+// ];
 
 const schemaStaff = yup.object().shape({
-  staffUsername: yup.string().required('Vui lòng nhập username'),
+  staffUsername: yup.string().required('Please enter username'),
+  staffEmail: yup.string().email('Email must be a valid email').nullable(),
   staffPassword: yup
     .string()
-    .min(8, 'Mật khẩu phải có tối thiểu 8 ký tự')
-    .required('Vui lòng nhập password'),
+    .min(8, 'Password must have a minimum of 8 characters')
+    .required('Please enter password'),
   staffConfirmPassword: yup
     .string()
-    .required('Vui lòng xác nhận lại mật khẩu')
-    .oneOf([yup.ref('staffPassword'), null], 'Mật khẩu chưa trùng khớp'),
-  staffRole: yup.string().required('Vui lòng chọn quyền hạn cho tài khoản'),
+    .required('Please confirm your password again')
+    .oneOf([yup.ref('staffPassword'), null], 'Password does not match'),
+  // staffRole: yup.string().required('Vui lòng chọn quyền hạn cho tài khoản'),
 });
 
 function StaffModal({ open, setOpen, setIsLoading }) {
+  const [isSuccess, setIsSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { handleSubmit, control, reset } = useForm({
     defaultValues: {
       staffUsername: '',
       staffPassword: '',
       staffConfirmPassword: '',
-      staffRole: '',
+      // staffRole: '',
     },
     resolver: yupResolver(schemaStaff),
   });
@@ -77,25 +79,31 @@ function StaffModal({ open, setOpen, setIsLoading }) {
       staffUsername: '',
       staffPassword: '',
       staffConfirmPassword: '',
-      staffRole: '',
+      // staffRole: '',
     });
   };
 
   const handleAdd = handleSubmit(async (data) => {
     try {
+      setIsSuccess(true);
       const result = await addStaffAccountApi(data);
-      if (result.status === 201) {
+      if (result?.status === 201) {
         reset({
           staffUsername: '',
+          staffEmail: '',
           staffPassword: '',
           staffConfirmPassword: '',
-          staffRole: '',
+          // staffRole: '',
         });
         setOpen(false);
-        toast.success(result.message);
-        setIsLoading(true);
+        toast.success(result?.message);
+      } else {
+        toast.error(result?.message);
       }
+      setIsSuccess(false);
+      setIsLoading(true);
     } catch (error) {
+      setIsLoading(true);
       toast.error(error.message);
     }
   });
@@ -103,10 +111,7 @@ function StaffModal({ open, setOpen, setIsLoading }) {
   return (
     <div className='wrapper'>
       <Modal open={open} onClose={() => handleClose()}>
-        <Box
-          sx={{ bgcolor: 'background.paper', boxShadow: 24 }}
-          className={cx('modal')}
-        >
+        <Box sx={{ bgcolor: 'background.paper', boxShadow: 24 }} className={cx('modal')}>
           <Box>
             <Box>
               <Typography
@@ -157,11 +162,14 @@ function StaffModal({ open, setOpen, setIsLoading }) {
               >
                 Username
               </TypographyStyle>
-              <TextFieldStyle
-                control={control}
-                name='staffUsername'
-                placeholder='Username'
-              />
+              <TextFieldStyle control={control} name='staffUsername' placeholder='Username' />
+            </Grid>
+
+            <Grid item xs={12}>
+              <TypographyStyle component='label' htmlFor='staffEmail' variant='h5'>
+                Email
+              </TypographyStyle>
+              <TextFieldStyle control={control} name='staffEmail' placeholder='Email' />
             </Grid>
 
             <Grid item xs={12}>
@@ -228,13 +236,8 @@ function StaffModal({ open, setOpen, setIsLoading }) {
               </FormControl>
             </Grid>
 
-            <Grid item xs={12}>
-              <TypographyStyle
-                component='label'
-                htmlFor='staffRole'
-                variant='h5'
-                isRequired={true}
-              >
+            {/* <Grid item xs={12}>
+              <TypographyStyle component='label' htmlFor='staffRole' variant='h5' isRequired={true}>
                 Role
               </TypographyStyle>
 
@@ -244,15 +247,23 @@ function StaffModal({ open, setOpen, setIsLoading }) {
                 options={optionRoles}
                 title='Chọn quyền hạn cho tài khoản'
               />
-            </Grid>
+            </Grid> */}
           </Grid>
 
           <Button
             variant='contained'
             sx={{ fontSize: '1.3rem', mt: 3 }}
+            disabled={isSuccess}
             onClick={() => handleAdd()}
           >
-            Create account
+            {isSuccess ? (
+              <>
+                <CircularProgress size='14px' sx={{ mr: 1 }} />
+                Create account...
+              </>
+            ) : (
+              'Create account'
+            )}
           </Button>
         </Box>
       </Modal>

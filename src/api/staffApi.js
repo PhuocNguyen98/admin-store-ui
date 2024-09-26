@@ -1,30 +1,19 @@
 import { baseApi } from '~/utils/axios';
 
 // Staff
-export const getStaffApi = async (order, sort, page, limit, search) => {
-  let url = `/staff`;
-
-  if (order) {
-    url += `?order=${order}`;
-  }
-  if (sort) {
-    url += `&sort=${sort}`;
-  }
-  if (page) {
-    url += `&page=${page}`;
-  }
-  if (limit) {
-    url += `&limit=${limit}`;
-  }
-  if (search) {
-    url += `&search=${search}`;
-  }
+export const getStaffApi = async (search, sort, order, page, limit) => {
+  let url = `/staff?search=${search}&sort=${sort}&order=${order}&page=${page}&limit=${limit}`;
   const res = await baseApi.get(url);
   return res;
 };
 
 export const getStaffByIdApi = async (id) => {
   const res = await baseApi.get(`/staff/${id}`);
+  return res;
+};
+
+export const getStaffProfileApi = async () => {
+  const res = await baseApi.get(`/staff/profile`);
   return res;
 };
 
