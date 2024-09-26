@@ -52,7 +52,7 @@ function DatePickerStyle({ control, name }) {
               <DatePicker
                 autoFocus={false}
                 inputFormat='DD-MM-YYYY'
-                value={value}
+                value={value ? value : null}
                 onChange={onChange}
                 format='DD-MM-YYYY'
                 slotProps={{

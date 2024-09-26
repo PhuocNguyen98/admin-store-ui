@@ -61,8 +61,8 @@ function Header() {
 
   const getInfoAccount = async () => {
     const res = await getAccountStaff();
-    if (res?.data?.status === 200 && res.data?.account) {
-      setAccount(res.data.account);
+    if (res?.status === 200 && res?.account) {
+      setAccount(res.account);
     }
   };
 

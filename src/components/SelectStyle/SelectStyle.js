@@ -42,15 +42,14 @@ function SelectStyle({ control, name, options, title, ...props }) {
           <FormControl fullWidth>
             <Select
               onChange={onChange}
-              value={
-                value === undefined || value === null || options.length === 0
-                  ? ''
-                  : value
-              }
+              value={value === undefined || value === null || options.length === 0 ? '' : value}
               error={!!error}
               {...props}
             >
               <MenuItem disabled>{title}</MenuItem>
+              <MenuItem value=''>
+                <em>None</em>
+              </MenuItem>
               {options.length > 0 ? (
                 options.map((item) => {
                   return (
@@ -60,9 +59,7 @@ function SelectStyle({ control, name, options, title, ...props }) {
                   );
                 })
               ) : (
-                <span
-                  style={{ display: 'block', textAlign: 'center', padding: 10 }}
-                >
+                <span style={{ display: 'block', textAlign: 'center', padding: 10 }}>
                   No data available
                 </span>
               )}
