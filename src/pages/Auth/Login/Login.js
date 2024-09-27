@@ -117,6 +117,7 @@ function Login({ setToken }) {
 
   return (
     <ThemeProvider theme={themeLogin}>
+      <ToastContainer style={{ fontSize: '1.4rem' }} />
       <div className={cx('wrapper')}>
         <Container
           component='main'

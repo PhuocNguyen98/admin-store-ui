@@ -9,3 +9,8 @@ export const updateUserProfileApi = async (data) => {
   const res = await baseApi.put(`/user/profile`, data);
   return res;
 };
+
+export const changeUserPasswordApi = async (data) => {
+  const res = await baseApi.put(`/user/profile/change/password`, data);
+  return res;
+};
