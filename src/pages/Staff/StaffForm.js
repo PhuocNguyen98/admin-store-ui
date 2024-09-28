@@ -71,43 +71,19 @@ function StaffForm() {
     try {
       const result = await getStaffByIdApi(id);
       if (result.status === 200) {
-        setValue(
-          'staffFirstName',
-          result.data[0].first_name ? result.data[0].first_name : '',
-        );
-        setValue(
-          'staffLastName',
-          result.data[0].last_name ? result.data[0].last_name : '',
-        );
-        setValue(
-          'staffGender',
-          result.data[0].gender ? result.data[0].gender : '',
-        );
-        setValue(
-          'staffEmail',
-          result.data[0].email ? result.data[0].email : '',
-        );
-        setValue(
-          'staffPhone',
-          result.data[0].phone ? result.data[0].phone : '',
-        );
-        setValue(
-          'staffAddress',
-          result.data[0].address ? result.data[0].address : '',
-        );
-        setValue(
-          'staffEducation',
-          result.data[0].education ? result.data[0].education : '',
-        );
-        setValue(
-          'staffInformation',
-          result.data[0].information ? result.data[0].information : '',
-        );
+        setValue('staffFirstName', result.data[0].first_name ? result.data[0].first_name : '');
+        setValue('staffLastName', result.data[0].last_name ? result.data[0].last_name : '');
+        setValue('staffGender', result.data[0].gender ? result.data[0].gender : '');
+        setValue('staffEmail', result.data[0].email ? result.data[0].email : '');
+        setValue('staffPhone', result.data[0].phone ? result.data[0].phone : '');
+        setValue('staffAddress', result.data[0].address ? result.data[0].address : '');
+        setValue('staffEducation', result.data[0].education ? result.data[0].education : '');
         setValue(
           'staffBirthday',
-          dayjs(result.data[0].staffBirthday, 'DD-MM-YYYY'),
+          result.data[0].birthday ? dayjs(result.data[0].birthday, 'DD-MM-YYYY') : '',
         );
 
+        setTextValue(result.data[0].information ? result.data[0].information : '');
         setAvatar(result.data[0].avatar);
       }
     } catch (error) {
@@ -123,7 +99,6 @@ function StaffForm() {
 
   return (
     <Box>
-
       <Box>
         <BreadcrumbStyle />
 
@@ -176,41 +151,21 @@ function StaffForm() {
 
           <Grid item container xs={12} xl={8} spacing={2}>
             <Grid item xs={12} xl={6}>
-              <TypographyStyle
-                component='label'
-                variant='h5'
-                htmlFor='staffFirstName'
-              >
+              <TypographyStyle component='label' variant='h5' htmlFor='staffFirstName'>
                 First Name
               </TypographyStyle>
-              <TextFieldStyle
-                control={control}
-                name='staffFirstName'
-                placeholder='First name'
-              />
+              <TextFieldStyle control={control} name='staffFirstName' placeholder='First name' />
             </Grid>
 
             <Grid item xs={12} xl={6}>
-              <TypographyStyle
-                component='label'
-                variant='h5'
-                htmlFor='staffLastName'
-              >
+              <TypographyStyle component='label' variant='h5' htmlFor='staffLastName'>
                 Last name
               </TypographyStyle>
-              <TextFieldStyle
-                control={control}
-                name='staffLastName'
-                placeholder='Last name'
-              />
+              <TextFieldStyle control={control} name='staffLastName' placeholder='Last name' />
             </Grid>
 
             <Grid item xs={12} xl={6}>
-              <TypographyStyle
-                component='label'
-                variant='h5'
-                htmlFor='staffGender'
-              >
+              <TypographyStyle component='label' variant='h5' htmlFor='staffGender'>
                 Gender
               </TypographyStyle>
               <SelectStyle
@@ -222,68 +177,36 @@ function StaffForm() {
             </Grid>
 
             <Grid item xs={12} xl={6}>
-              <TypographyStyle
-                component='label'
-                variant='h5'
-                htmlFor='staffBirthday'
-              >
+              <TypographyStyle component='label' variant='h5' htmlFor='staffBirthday'>
                 Birthday
               </TypographyStyle>
               <DatePickerStyle control={control} name='staffBirthday' />
             </Grid>
 
             <Grid item xs={12} xl={6}>
-              <TypographyStyle
-                component='label'
-                variant='h5'
-                htmlFor='staffEmail'
-              >
+              <TypographyStyle component='label' variant='h5' htmlFor='staffEmail'>
                 Email
               </TypographyStyle>
-              <TextFieldStyle
-                control={control}
-                name='staffEmail'
-                placeholder='Email'
-              />
+              <TextFieldStyle control={control} name='staffEmail' placeholder='Email' />
             </Grid>
 
             <Grid item xs={12} xl={6}>
-              <TypographyStyle
-                component='label'
-                variant='h5'
-                htmlFor='staffPhone'
-              >
+              <TypographyStyle component='label' variant='h5' htmlFor='staffPhone'>
                 Phone
               </TypographyStyle>
-              <TextFieldStyle
-                control={control}
-                name='staffPhone'
-                placeholder='Phone'
-              />
+              <TextFieldStyle control={control} name='staffPhone' placeholder='Phone' />
             </Grid>
           </Grid>
 
           <Grid item xs={12}>
-            <TypographyStyle
-              component='label'
-              variant='h5'
-              htmlFor='staffAddress'
-            >
+            <TypographyStyle component='label' variant='h5' htmlFor='staffAddress'>
               Address
             </TypographyStyle>
-            <TextFieldStyle
-              control={control}
-              name='staffAddress'
-              placeholder='Address'
-            />
+            <TextFieldStyle control={control} name='staffAddress' placeholder='Address' />
           </Grid>
 
           <Grid item xs={12}>
-            <TypographyStyle
-              component='label'
-              variant='h5'
-              htmlFor='staffEducation'
-            >
+            <TypographyStyle component='label' variant='h5' htmlFor='staffEducation'>
               Education
             </TypographyStyle>
             <TextFieldStyle
@@ -296,11 +219,7 @@ function StaffForm() {
           </Grid>
 
           <Grid item xs={12}>
-            <TypographyStyle
-              component='label'
-              variant='h5'
-              htmlFor='staffInformation'
-            >
+            <TypographyStyle component='label' variant='h5' htmlFor='staffInformation'>
               Additional information
             </TypographyStyle>
 

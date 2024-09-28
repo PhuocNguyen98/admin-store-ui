@@ -35,10 +35,10 @@ const columns = [
     sortTable: true,
     component: 'text',
   },
-  { label: 'Discount', accessor: 'percent', component: 'text' },
+  { label: 'Discount', accessor: 'percent', component: 'text', sortTable: true },
   { label: 'Thumbnail', accessor: 'thumbnail', component: 'image' },
-  { label: 'Start time', accessor: 'start_time', component: 'text' },
-  { label: 'End time', accessor: 'end_time', component: 'text' },
+  { label: 'Start time', accessor: 'start_time', component: 'text', sortTable: true },
+  { label: 'End time', accessor: 'end_time', component: 'text', sortTable: true },
   {
     label: 'Status',
     accessor: 'is_status',

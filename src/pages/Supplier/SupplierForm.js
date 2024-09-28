@@ -130,7 +130,7 @@ function SupplierForm() {
     setIsSuccess(true);
     const formData = handleFormData(data);
     try {
-      console.log([...formData]);
+      // console.log([...formData]);
       const res = await updateSupplierApi(id, formData);
       if (res?.status === 200) {
         toast.success(res.message);
@@ -171,7 +171,6 @@ function SupplierForm() {
 
   return (
     <Box>
-   
       <Box>
         <BreadcrumbStyle />
 

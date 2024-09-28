@@ -65,16 +65,18 @@ function TableBodyStyle({ columns, tableData, actions, control, setValue }) {
       case 'image': {
         return (
           <TableCell key={column.accessor}>
-            <img
-              src={`${data}`}
-              alt=''
-              style={{
-                width: '100px',
-                height: '100px',
-                objectFit: 'cover',
-              }}
-              onError={(e) => onErrorImg(e)}
-            />
+            {data ? (
+              <img
+                src={`${data}`}
+                alt=''
+                style={{
+                  width: '100px',
+                  height: '100px',
+                  objectFit: 'cover',
+                }}
+                onError={(e) => onErrorImg(e)}
+              />
+            ) : null}
           </TableCell>
         );
       }
