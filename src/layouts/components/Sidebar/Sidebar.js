@@ -54,16 +54,16 @@ const NAV_LIST = [
       },
     ],
   },
-  {
-    subCategoty: 'Customer',
-    children: [
-      {
-        icon: <PeopleIcon />,
-        title: 'Customer',
-        to: '/',
-      },
-    ],
-  },
+  // {
+  //   subCategoty: 'Customer',
+  //   children: [
+  //     {
+  //       icon: <PeopleIcon />,
+  //       title: 'Customer',
+  //       to: '/',
+  //     },
+  //   ],
+  // },
   {
     subCategoty: 'Staff',
     children: [
@@ -79,9 +79,7 @@ const NAV_LIST = [
 function Sidebar() {
   return (
     <Box className={cx('wrapper')}>
-      {NAV_LIST
-        ? NAV_LIST.map((item, index) => <Menu key={index} items={item}></Menu>)
-        : ''}
+      {NAV_LIST ? NAV_LIST.map((item, index) => <Menu key={index} items={item}></Menu>) : ''}
     </Box>
   );
 }
