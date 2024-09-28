@@ -185,7 +185,7 @@ function TableBodyStyle({ columns, tableData, actions, control, setValue }) {
           renderTableBody()
         ) : (
           <TableRow>
-            <TableCell colSpan={5} sx={{ textAlign: 'center' }}>
+            <TableCell colSpan={columns.length} sx={{ fontSize: '1.6rem' }}>
               No data
             </TableCell>
           </TableRow>
