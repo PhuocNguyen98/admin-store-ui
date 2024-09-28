@@ -23,7 +23,7 @@ import TableHeadStyle from '~/components/TableStyle/TableHeadStyle';
 import TableBodyStyle from '~/components/TableStyle/TableBodyStyle';
 import TablePaginationStyle from '~/components/TableStyle/TablePaginationStyle';
 
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { getDiscountApi, quickUpdateDiscountApi } from '~/api/discountApi';
 
 // Define column table
@@ -153,7 +153,6 @@ function Discount() {
         <Loader />
       ) : (
         <div className='wrapper'>
-          <ToastContainer />
           <BreadcrumbStyle />
           <Box
             sx={{

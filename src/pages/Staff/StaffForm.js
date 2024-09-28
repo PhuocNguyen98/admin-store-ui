@@ -12,7 +12,7 @@ import { useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 import SelectStyle from '~/components/SelectStyle';
 import CKEditorStyle from '~/components/CKEditorStyle';
@@ -123,7 +123,7 @@ function StaffForm() {
 
   return (
     <Box>
-      <ToastContainer />
+
       <Box>
         <BreadcrumbStyle />
 

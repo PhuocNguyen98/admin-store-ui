@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 import TypographyStyle from '~/components/FormStyle/TypographyStyle';
 import OutlinedInputStyle from '~/components/FormStyle/OutlinedInputStyle';
@@ -79,7 +79,7 @@ function PasswordForm() {
 
   return (
     <>
-      <ToastContainer />
+   
       <Paper elevation={1} sx={{ p: '30px' }}>
         <Grid container spacing={3}>
           <Grid item container xs={12} xl={6} spacing={2}>

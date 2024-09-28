@@ -11,7 +11,7 @@ import { useState, useEffect, useRef } from 'react';
 import dayjs from 'dayjs';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 import SelectStyle from '~/components/SelectStyle';
 import CKEditorStyle from '~/components/CKEditorStyle';
@@ -170,7 +170,7 @@ function InformationForm() {
 
   return (
     <>
-      <ToastContainer />
+    
       <Paper elevation={1} sx={{ p: '30px' }}>
         <Grid container spacing={3}>
           <Grid item container xs={12} xl={4}>

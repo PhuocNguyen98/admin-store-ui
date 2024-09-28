@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
 
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { useState, useEffect } from 'react';
 
@@ -159,7 +159,7 @@ function Staff() {
         <Loader />
       ) : (
         <div className='wrapper'>
-          <ToastContainer />
+     
           <BreadcrumbStyle />
           <Box
             sx={{

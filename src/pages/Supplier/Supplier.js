@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 import config from '~/config';
 import useDebounce from '~/hooks/useDebounce';
@@ -156,7 +156,7 @@ function Supplier() {
         <Loader />
       ) : (
         <div className='wrapper'>
-          <ToastContainer />
+     
           <BreadcrumbStyle />
           <Box
             sx={{

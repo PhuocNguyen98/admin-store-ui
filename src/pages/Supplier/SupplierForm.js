@@ -12,7 +12,7 @@ import { useParams } from 'react-router-dom';
 
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 import SelectStyle from '~/components/SelectStyle';
 import ButtonStyle from '~/components/ButtonStyle';
@@ -171,7 +171,7 @@ function SupplierForm() {
 
   return (
     <Box>
-      <ToastContainer />
+   
       <Box>
         <BreadcrumbStyle />
 

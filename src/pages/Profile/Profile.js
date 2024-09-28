@@ -5,8 +5,6 @@ import Typography from '@mui/material/Typography';
 
 import { useState } from 'react';
 
-import { ToastContainer } from 'react-toastify';
-
 import BreadcrumbStyle from '~/components/BreadcrumbStyle';
 
 import InformationForm from './InformationForm';
@@ -42,7 +40,7 @@ function Profile() {
 
   return (
     <Box sx={{ width: '100%' }}>
-      <ToastContainer />
+  
       <Box>
         <BreadcrumbStyle />
         <Typography

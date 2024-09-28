@@ -23,7 +23,7 @@ import ToolTipStyle from '~/components/ToolTipStyle';
 
 import { getCategoryApi, quickUpdateCategoryApi } from '~/api/categoryApi';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import Loader from '~/components/Loader';
 
 // Define column table
@@ -155,7 +155,6 @@ function Category() {
         <Loader />
       ) : (
         <div className='wrapper'>
-          <ToastContainer />
           <BreadcrumbStyle />
           <Box
             sx={{
