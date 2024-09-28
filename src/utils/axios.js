@@ -26,13 +26,45 @@ axiosInstance.interceptors.response.use(
     if (response && response?.data) return response.data;
     return response;
   },
-  function (error) {
+  async function (error) {
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
+
+    if (error.response.status === 401) {
+      try {
+        const newAccessToken = await refreshToken();
+        if (!newAccessToken) {
+          localStorage.removeItem('access_token');
+          window.location.href = `/login`;
+        } else {
+          localStorage.setItem('access_token', newAccessToken);
+        }
+      } catch (error) {
+        localStorage.removeItem('access_token');
+        window.location.href = `/login`;
+      }
+    }
+
     if (error && error.response?.data) return Promise.reject(error.response.data);
     return Promise.reject(error);
   },
 );
+
+async function refreshToken() {
+  try {
+    const res = await axiosInstance.post('/account/refreshToken', {
+      token: localStorage.getItem('access_token'),
+    });
+    if (res?.data.status === 200 && res?.data?.refreshToken) {
+      return res?.data?.refreshToken;
+    } else {
+      console.log(res?.data?.message);
+      return null;
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+}
 
 const get = async (path, object) => (await axiosInstance.get(path, object)).data;
 

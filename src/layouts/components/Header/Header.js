@@ -66,9 +66,6 @@ function Header() {
       const res = await getAccountStaff();
       if (res?.status === 200 && res?.data) {
         dispatch(fetchDataSuccess(res.data));
-        toast.success(res?.message);
-      } else {
-        toast.error(res?.message);
       }
     } catch (error) {
       toast.error(error?.message);
