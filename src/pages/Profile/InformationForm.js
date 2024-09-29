@@ -15,6 +15,7 @@ import { toast } from 'react-toastify';
 
 import SelectStyle from '~/components/SelectStyle';
 import CKEditorStyle from '~/components/CKEditorStyle';
+import BackdropStyle from '~/components/BackdropStyle';
 import DatePickerStyle from '~/components/DatePickerStyle';
 import TextFieldStyle from '~/components/FormStyle/TextFieldStyle';
 import TypographyStyle from '~/components/FormStyle/TypographyStyle';
@@ -170,7 +171,7 @@ function InformationForm() {
 
   return (
     <>
-    
+      <BackdropStyle open={isSuccess} title='Updating...' />
       <Paper elevation={1} sx={{ p: '30px' }}>
         <Grid container spacing={3}>
           <Grid item container xs={12} xl={4}>

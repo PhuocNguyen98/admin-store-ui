@@ -18,6 +18,7 @@ import SelectStyle from '~/components/SelectStyle';
 import ButtonStyle from '~/components/ButtonStyle';
 import CKEditorStyle from '~/components/CKEditorStyle';
 import DropzoneStyle from '~/components/DropzoneStyle';
+import BackdropStyle from '~/components/BackdropStyle';
 import BreadcrumbStyle from '~/components/BreadcrumbStyle';
 import NumericFormatStyle from '~/components/NumericFormatStyle';
 import TextFieldStyle from '~/components/FormStyle/TextFieldStyle';
@@ -261,10 +262,9 @@ function ProductForm() {
 
   return (
     <Box>
-  
+      <BackdropStyle open={isSuccess} title={id ? ' Updating...' : 'Creating...'} />
       <Box>
         <BreadcrumbStyle />
-
         <Typography
           variant='h3'
           component='h4'

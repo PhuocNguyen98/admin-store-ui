@@ -17,6 +17,7 @@ import { toast } from 'react-toastify';
 import SelectStyle from '~/components/SelectStyle';
 import ButtonStyle from '~/components/ButtonStyle';
 import DropzoneStyle from '~/components/DropzoneStyle';
+import BackdropStyle from '~/components/BackdropStyle';
 import BreadcrumbStyle from '~/components/BreadcrumbStyle';
 import TextFieldStyle from '~/components/FormStyle/TextFieldStyle';
 import TypographyStyle from '~/components/FormStyle/TypographyStyle';
@@ -170,6 +171,7 @@ function CategoryForm() {
 
   return (
     <Box>
+      <BackdropStyle open={isSuccess} title={id ? ' Updating...' : 'Creating...'} />
       <Box>
         <BreadcrumbStyle />
 
@@ -199,7 +201,6 @@ function CategoryForm() {
         </Typography>
       </Box>
       <Divider />
-
       <Paper elevation={6} sx={{ p: '30px', mt: 3 }}>
         <Box width='50%' component='form' action='POST'>
           <Box mb={3}>

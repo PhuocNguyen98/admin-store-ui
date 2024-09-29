@@ -21,6 +21,7 @@ import SelectStyle from '~/components/SelectStyle';
 import ButtonStyle from '~/components/ButtonStyle';
 import CKEditorStyle from '~/components/CKEditorStyle';
 import DropzoneStyle from '~/components/DropzoneStyle';
+import BackdropStyle from '~/components/BackdropStyle';
 import DatePickerStyle from '~/components/DatePickerStyle';
 import BreadcrumbStyle from '~/components/BreadcrumbStyle';
 import TextFieldStyle from '~/components/FormStyle/TextFieldStyle';
@@ -185,7 +186,7 @@ function DiscountForm() {
 
   return (
     <Box>
-   
+      <BackdropStyle open={isSuccess} title={id ? ' Updating...' : 'Creating...'} />
       <Box>
         <BreadcrumbStyle />
 
