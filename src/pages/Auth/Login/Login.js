@@ -107,9 +107,9 @@ function Login({ setToken }) {
   const onSubmit = handleSubmit(async (data) => {
     try {
       const res = await loginStaff(data);
-      if (res?.status === 200) {
+      if (res?.status === 200 && res?.data) {
         toast.success(res?.message);
-        setToken(res?.access_token);
+        setToken(res.data);
         navigate(config.routes.dashboard);
       } else {
         toast.error(res?.message ?? 'error');

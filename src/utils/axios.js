@@ -1,5 +1,22 @@
 import axios from 'axios';
 
+async function refreshToken() {
+  try {
+    const res = await axiosInstance.post('/account/token', {
+      token: localStorage.getItem('refresh_token'),
+    });
+
+    if (res?.data.status === 200 && res?.data?.data) {
+      return res.data.data;
+    } else {
+      console.log(res?.data?.message);
+      return null;
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+}
+
 export const axiosInstance = axios.create({
   baseURL: process.env.REACT_APP_BASE_URL,
 });
@@ -32,15 +49,20 @@ axiosInstance.interceptors.response.use(
 
     if (error.response.status === 401) {
       try {
-        const newAccessToken = await refreshToken();
-        if (!newAccessToken) {
+        const data = await refreshToken();
+        if (!data) {
           localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
           window.location.href = `/login`;
         } else {
-          localStorage.setItem('access_token', newAccessToken);
+          localStorage.setItem('access_token', data?.access_token);
+          localStorage.setItem('refresh_token', data?.refresh_token);
+          error.response.config.headers['Authorization'] = 'Bearer ' + data?.access_token;
+          return axiosInstance(error.config);
         }
       } catch (error) {
         localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
         window.location.href = `/login`;
       }
     }
@@ -49,22 +71,6 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(error);
   },
 );
-
-async function refreshToken() {
-  try {
-    const res = await axiosInstance.post('/account/refreshToken', {
-      token: localStorage.getItem('access_token'),
-    });
-    if (res?.data.status === 200 && res?.data?.refreshToken) {
-      return res?.data?.refreshToken;
-    } else {
-      console.log(res?.data?.message);
-      return null;
-    }
-  } catch (error) {
-    console.log(error.message);
-  }
-}
 
 const get = async (path, object) => (await axiosInstance.get(path, object)).data;
 
