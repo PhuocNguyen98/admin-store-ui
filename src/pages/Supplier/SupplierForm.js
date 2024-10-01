@@ -14,6 +14,7 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { toast } from 'react-toastify';
 
+import Loader from '~/components/Loader';
 import SelectStyle from '~/components/SelectStyle';
 import ButtonStyle from '~/components/ButtonStyle';
 import DropzoneStyle from '~/components/DropzoneStyle';
@@ -61,6 +62,7 @@ function SupplierForm() {
   const [data, setData] = useState([]); // Save data after call API( by id)
   const [files, setFiles] = useState([]); // Save image new
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const { handleSubmit, control, watch, setValue, clearErrors, reset } = useForm({
     defaultValues: {
@@ -159,8 +161,10 @@ function SupplierForm() {
       } else {
         toast.error(res.message);
       }
+      setIsLoading(false);
     } catch (error) {
       toast.error(error.message);
+      setIsLoading(false);
     }
   };
 
@@ -171,166 +175,174 @@ function SupplierForm() {
   }, [id]);
 
   return (
-    <Box>
-      <BackdropStyle open={isSuccess} title={id ? ' Updating...' : 'Creating...'} />
-      <Box>
-        <BreadcrumbStyle />
-        <Typography
-          variant='h3'
-          component='h4'
-          sx={{
-            fontWeight: 600,
-            color: 'text.primary',
-          }}
-        >
-          Suppliers
-        </Typography>
-
-        <Typography
-          variant='subtitle1'
-          component='span'
-          gutterBottom
-          sx={{
-            fontSize: '1.4rem',
-            color: '#919aa3',
-            display: 'inline-flex',
-            paddingBottom: 1,
-          }}
-        >
-          {data.length > 0 ? 'Edit supplier for the system' : 'Create new supplier for the system'}
-        </Typography>
-      </Box>
-      <Divider />
-
-      <Paper elevation={6} sx={{ p: '30px', mt: 3 }}>
-        <Box width='50%' component='form' action='POST'>
-          <Box mb={3}>
-            <TypographyStyle
-              component='label'
-              htmlFor='supplierName'
-              variant='h5'
-              isRequired={true}
-            >
-              Supplier name
-            </TypographyStyle>
-            <TextFieldStyle control={control} name='supplierName' placeholder='Supplier name' />
-          </Box>
-
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <Box mb={3} flex={1}>
-              <TypographyStyle
-                component='label'
-                variant='h5'
-                htmlFor='supplierSlug'
-                isRequired={true}
-                comment='Click the generate slug button to create the slug'
-              >
-                Supplier slug
-              </TypographyStyle>
-
-              <TextFieldStyle
-                control={control}
-                name='supplierSlug'
-                disabled={true}
-                placeholder='Supplier slug'
-              />
-            </Box>
-            <ButtonStyle
-              sx={{ ml: 1 }}
-              variant='contained'
-              color='primary'
-              startIcon={<AutorenewIcon />}
-              disabled={!!watchSupplierName ? false : true}
-              onClick={() => handleGenerateSlug(watchSupplierName)}
-            >
-              Generate slug
-            </ButtonStyle>
-          </Box>
-
-          {data.length > 0 ? (
-            <>
-              <Box mb={3}>
-                <TypographyStyle component='label' htmlFor='supplierStatus' variant='h5'>
-                  Supplier status
-                </TypographyStyle>
-                <SelectStyle
-                  control={control}
-                  name='supplierStatus'
-                  options={optionsStatus}
-                ></SelectStyle>
-              </Box>
-
-              <Box mb={3}>
-                <TypographyStyle component='label' htmlFor='supplierDisplay' variant='h5'>
-                  Supplier display
-                </TypographyStyle>
-                <SelectStyle
-                  control={control}
-                  name='supplierDisplay'
-                  options={optionsDisplay}
-                ></SelectStyle>
-              </Box>
-            </>
-          ) : null}
-
+    <>
+      {id && isLoading ? (
+        <Loader />
+      ) : (
+        <Box>
+          <BackdropStyle open={isSuccess} title={id ? ' Updating...' : 'Creating...'} />
           <Box>
-            <TypographyStyle component='label' variant='h5' htmlFor='supplierImage'>
-              Supplier thumbnail
-            </TypographyStyle>
+            <BreadcrumbStyle />
+            <Typography
+              variant='h3'
+              component='h4'
+              sx={{
+                fontWeight: 600,
+                color: 'text.primary',
+              }}
+            >
+              Suppliers
+            </Typography>
 
-            <DropzoneStyle
-              control={control}
-              name='supplierImage'
-              multiple={false}
-              files={files}
-              setFiles={setFiles}
-            />
+            <Typography
+              variant='subtitle1'
+              component='span'
+              gutterBottom
+              sx={{
+                fontSize: '1.4rem',
+                color: '#919aa3',
+                display: 'inline-flex',
+                paddingBottom: 1,
+              }}
+            >
+              {data.length > 0
+                ? 'Edit supplier for the system'
+                : 'Create new supplier for the system'}
+            </Typography>
           </Box>
-        </Box>
+          <Divider />
 
-        {data.length > 0 ? (
-          <ButtonStyle
-            variant='contained'
-            size='large'
-            sx={{ mt: 4 }}
-            disabled={isSuccess}
-            onClick={() => handleEdit()}
-          >
-            {isSuccess ? (
-              <>
-                <CircularProgress size='14px' sx={{ mr: 1 }} />
-                Update supplier...
-              </>
+          <Paper elevation={6} sx={{ p: '30px', mt: 3 }}>
+            <Box width='50%' component='form' action='POST'>
+              <Box mb={3}>
+                <TypographyStyle
+                  component='label'
+                  htmlFor='supplierName'
+                  variant='h5'
+                  isRequired={true}
+                >
+                  Supplier name
+                </TypographyStyle>
+                <TextFieldStyle control={control} name='supplierName' placeholder='Supplier name' />
+              </Box>
+
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <Box mb={3} flex={1}>
+                  <TypographyStyle
+                    component='label'
+                    variant='h5'
+                    htmlFor='supplierSlug'
+                    isRequired={true}
+                    comment='Click the generate slug button to create the slug'
+                  >
+                    Supplier slug
+                  </TypographyStyle>
+
+                  <TextFieldStyle
+                    control={control}
+                    name='supplierSlug'
+                    disabled={true}
+                    placeholder='Supplier slug'
+                  />
+                </Box>
+                <ButtonStyle
+                  sx={{ ml: 1 }}
+                  variant='contained'
+                  color='primary'
+                  startIcon={<AutorenewIcon />}
+                  disabled={!!watchSupplierName ? false : true}
+                  onClick={() => handleGenerateSlug(watchSupplierName)}
+                >
+                  Generate slug
+                </ButtonStyle>
+              </Box>
+
+              {data.length > 0 ? (
+                <>
+                  <Box mb={3}>
+                    <TypographyStyle component='label' htmlFor='supplierStatus' variant='h5'>
+                      Supplier status
+                    </TypographyStyle>
+                    <SelectStyle
+                      control={control}
+                      name='supplierStatus'
+                      options={optionsStatus}
+                    ></SelectStyle>
+                  </Box>
+
+                  <Box mb={3}>
+                    <TypographyStyle component='label' htmlFor='supplierDisplay' variant='h5'>
+                      Supplier display
+                    </TypographyStyle>
+                    <SelectStyle
+                      control={control}
+                      name='supplierDisplay'
+                      options={optionsDisplay}
+                    ></SelectStyle>
+                  </Box>
+                </>
+              ) : null}
+
+              <Box>
+                <TypographyStyle component='label' variant='h5' htmlFor='supplierImage'>
+                  Supplier thumbnail
+                </TypographyStyle>
+
+                <DropzoneStyle
+                  control={control}
+                  name='supplierImage'
+                  multiple={false}
+                  files={files}
+                  setFiles={setFiles}
+                />
+              </Box>
+            </Box>
+
+            {data.length > 0 ? (
+              <ButtonStyle
+                variant='contained'
+                size='large'
+                sx={{ mt: 4 }}
+                disabled={isSuccess}
+                onClick={() => handleEdit()}
+              >
+                {isSuccess ? (
+                  <>
+                    <CircularProgress size='14px' sx={{ mr: 1 }} />
+                    Update supplier...
+                  </>
+                ) : (
+                  'Update supplier'
+                )}
+              </ButtonStyle>
             ) : (
-              'Update supplier'
+              <ButtonStyle
+                variant='contained'
+                size='large'
+                sx={{ mt: 4 }}
+                disabled={isSuccess}
+                onClick={() => handleAdd()}
+              >
+                {isSuccess ? (
+                  <>
+                    <CircularProgress size='14px' sx={{ mr: 1 }} />
+                    Create supplier...
+                  </>
+                ) : (
+                  'Create supplier'
+                )}
+              </ButtonStyle>
             )}
-          </ButtonStyle>
-        ) : (
-          <ButtonStyle
-            variant='contained'
-            size='large'
-            sx={{ mt: 4 }}
-            disabled={isSuccess}
-            onClick={() => handleAdd()}
-          >
-            {isSuccess ? (
-              <>
-                <CircularProgress size='14px' sx={{ mr: 1 }} />
-                Create supplier...
-              </>
-            ) : (
-              'Create supplier'
-            )}
-          </ButtonStyle>
-        )}
-      </Paper>
-    </Box>
+          </Paper>
+        </Box>
+      )}
+    </>
   );
 }
 

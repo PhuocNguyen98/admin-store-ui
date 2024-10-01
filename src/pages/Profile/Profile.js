@@ -8,7 +8,7 @@ import { useState } from 'react';
 import BreadcrumbStyle from '~/components/BreadcrumbStyle';
 
 import InformationForm from './InformationForm';
-import PasswordForm from './PasswordForm';
+// import PasswordForm from './PasswordForm';
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -40,7 +40,6 @@ function Profile() {
 
   return (
     <Box sx={{ width: '100%' }}>
-  
       <Box>
         <BreadcrumbStyle />
         <Typography
@@ -62,11 +61,11 @@ function Profile() {
             {...a11yProps(0)}
             sx={{ fontSize: '1.4rem', textTransform: 'capitalize' }}
           />
-          <Tab
+          {/* <Tab
             label='Password'
             {...a11yProps(1)}
             sx={{ fontSize: '1.4rem', textTransform: 'capitalize' }}
-          />
+          /> */}
         </Tabs>
       </Box>
 
@@ -74,9 +73,9 @@ function Profile() {
         <InformationForm />
       </CustomTabPanel>
 
-      <CustomTabPanel value={tabValue} index={1}>
+      {/* <CustomTabPanel value={tabValue} index={1}>
         <PasswordForm />
-      </CustomTabPanel>
+      </CustomTabPanel> */}
     </Box>
   );
 }

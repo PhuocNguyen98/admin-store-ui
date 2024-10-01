@@ -17,6 +17,7 @@ import Search from '~/components/Search';
 import Loader from '~/components/Loader';
 import TableStyle from '~/components/TableStyle';
 import ToolTipStyle from '~/components/ToolTipStyle';
+import BackdropStyle from '~/components/BackdropStyle';
 import BreadcrumbStyle from '~/components/BreadcrumbStyle';
 import TableHeadStyle from '~/components/TableStyle/TableHeadStyle';
 import TableBodyStyle from '~/components/TableStyle/TableBodyStyle';
@@ -42,15 +43,25 @@ const columns = [
     accessor: 'role',
     component: 'text',
   },
+  // {
+  //   label: 'Status',
+  //   accessor: 'is_status',
+  //   displayType: [
+  //     { title: 'Vô hiệu hóa', value: 0 },
+  //     { title: 'Đang kích hoạt', value: 1 },
+  //   ],
+  //   editTable: true,
+  //   component: 'select',
+  // },
   {
     label: 'Status',
     accessor: 'is_status',
     displayType: [
-      { title: 'Vô hiệu hóa', value: 0 },
-      { title: 'Đang kích hoạt', value: 1 },
+      { title: 'Vô hiệu hóa', value: 0, color: 'primary' },
+      { title: 'Đang kích hoạt', value: 1, color: 'success' },
     ],
-    editTable: true,
-    component: 'select',
+    // editTable: false,
+    component: 'chip',
   },
   { label: 'Actions', accessor: 'actions', component: 'actions' },
 ];
@@ -78,6 +89,7 @@ function Staff() {
   const [pageCurrent, setPageCurrent] = useState(1);
   const [searchValue, setSearchValue] = useState('');
   const debounceValue = useDebounce(searchValue, 500);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { control, setValue, handleSubmit } = useForm({
     defaultValues: {
@@ -136,22 +148,27 @@ function Staff() {
     }
   };
 
-  const onSubmit = handleSubmit(async (data) => {
-    try {
-      const res = await updateStaffAccountApi(data);
-      if (res?.status === 200) {
-        res?.flag ? toast.info(res?.message) : toast.success(res?.message);
-      } else {
-        toast.error(res?.message);
-      }
-    } catch (error) {
-      toast.error(error.message);
-    }
-  });
+  // const onSubmit = handleSubmit(async (data) => {
+  //   try {
+  //     setIsSuccess(true);
+  //     const res = await updateStaffAccountApi(data);
+  //     if (res?.status === 200) {
+  //       res?.flag ? toast.info(res?.message) : toast.success(res?.message);
+  //     } else {
+  //       toast.error(res?.message);
+  //     }
+  //     setIsSuccess(false);
+  //   } catch (error) {
+  //     toast.error(error.message);
+  //     setIsSuccess(false);
+  //   }
+  // });
 
   useEffect(() => {
-    getDataApi();
-  }, [debounceValue, order, sort, rowsPerPage, pageCurrent, isLoading]);
+    if (!isSuccess) {
+      getDataApi();
+    }
+  }, [debounceValue, order, sort, rowsPerPage, pageCurrent, isLoading, isSuccess]);
 
   return (
     <>
@@ -159,7 +176,7 @@ function Staff() {
         <Loader />
       ) : (
         <div className='wrapper'>
-     
+          <BackdropStyle open={isSuccess} title='Updating...' />
           <BreadcrumbStyle />
           <Box
             sx={{
@@ -221,7 +238,7 @@ function Staff() {
               }}
             >
               <Search label='Search staff username or email' handleSearch={handleSearch} />
-              {data.length > 0 ? (
+              {/* {data.length > 0 ? (
                 <ToolTipStyle title='Quickly update status staff account'>
                   <Button
                     variant='contained'
@@ -231,7 +248,7 @@ function Staff() {
                     Quick Update
                   </Button>
                 </ToolTipStyle>
-              ) : null}
+              ) : null} */}
             </Box>
 
             <TableStyle>

@@ -13,6 +13,7 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { toast } from 'react-toastify';
 
+import Loader from '~/components/Loader';
 import SelectStyle from '~/components/SelectStyle';
 import CKEditorStyle from '~/components/CKEditorStyle';
 import BackdropStyle from '~/components/BackdropStyle';
@@ -65,6 +66,7 @@ function InformationForm() {
   const [open, setOpen] = useState(false);
   const [textValue, setTextValue] = useState(''); // Save text CKEditor
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { control, setValue, handleSubmit } = useForm({
     defaultValues: {
       userFirstName: '',
@@ -156,8 +158,10 @@ function InformationForm() {
       } else {
         toast.error(res?.message);
       }
+      setIsLoading(false);
     } catch (error) {
       toast.error(error.message);
+      setIsLoading(false);
     }
   };
 
@@ -171,155 +175,171 @@ function InformationForm() {
 
   return (
     <>
-      <BackdropStyle open={isSuccess} title='Updating...' />
-      <Paper elevation={1} sx={{ p: '30px' }}>
-        <Grid container spacing={3}>
-          <Grid item container xs={12} xl={4}>
-            <Grid item xs={12}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                <Badge
-                  overlap='circular'
-                  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                  sx={{ position: 'relative' }}
-                  badgeContent={
-                    <div className={cx('edit-photo')} onClick={() => handleOpenEditPhoto()}>
-                      <CreateIcon sx={{ fontSize: '1.4rem', color: '#fff' }} />
-                      <span className={cx('edit-title')}>Edit</span>
-                      <div className={listActionsAvatar}>
-                        <button className={cx('btn-action')} onClick={() => handleUploadAvatar()}>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <>
+          <BackdropStyle open={isSuccess} title='Updating...' />
+          <Paper elevation={1} sx={{ p: '30px' }}>
+            <Grid container spacing={3}>
+              <Grid item container xs={12} xl={4}>
+                <Grid item xs={12}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Badge
+                      overlap='circular'
+                      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                      sx={{ position: 'relative' }}
+                      badgeContent={
+                        <div className={cx('edit-photo')} onClick={() => handleOpenEditPhoto()}>
                           <CreateIcon sx={{ fontSize: '1.4rem', color: '#fff' }} />
-                          <span>Upload a photo</span>
-                        </button>
-                        <button className={cx('btn-action')} onClick={() => handleRemoveAvatar()}>
-                          <DeleteIcon sx={{ fontSize: '1.4rem', color: '#fff' }} />
-                          <span>Remove photo</span>
-                        </button>
-                      </div>
-                    </div>
-                  }
-                >
-                  <Avatar
-                    alt=''
-                    src={
-                      avatar ? (avatar?.preview ? avatar.preview : avatar) : images.imgPlacehoder
-                    }
-                    sx={{ width: 280, height: 280, border: '1px solid #ccc' }}
+                          <span className={cx('edit-title')}>Edit</span>
+                          <div className={listActionsAvatar}>
+                            <button
+                              className={cx('btn-action')}
+                              onClick={() => handleUploadAvatar()}
+                            >
+                              <CreateIcon sx={{ fontSize: '1.4rem', color: '#fff' }} />
+                              <span>Upload a photo</span>
+                            </button>
+                            <button
+                              className={cx('btn-action')}
+                              onClick={() => handleRemoveAvatar()}
+                            >
+                              <DeleteIcon sx={{ fontSize: '1.4rem', color: '#fff' }} />
+                              <span>Remove photo</span>
+                            </button>
+                          </div>
+                        </div>
+                      }
+                    >
+                      <Avatar
+                        alt=''
+                        src={
+                          avatar
+                            ? avatar?.preview
+                              ? avatar.preview
+                              : avatar
+                            : images.imgPlacehoder
+                        }
+                        sx={{ width: 280, height: 280, border: '1px solid #ccc' }}
+                      />
+                    </Badge>
+                    <input
+                      type='file'
+                      ref={inputFileRef}
+                      style={{ display: 'none' }}
+                      onChange={(e) => handleChangeAvatar(e)}
+                    ></input>
+                  </Box>
+                </Grid>
+              </Grid>
+
+              <Grid item container xs={12} xl={8} spacing={2}>
+                <Grid item xs={12} xl={6}>
+                  <TypographyStyle component='label' variant='h5' htmlFor='userFirstName'>
+                    First Name
+                  </TypographyStyle>
+                  <TextFieldStyle control={control} name='userFirstName' placeholder='First name' />
+                </Grid>
+
+                <Grid item xs={12} xl={6}>
+                  <TypographyStyle component='label' variant='h5' htmlFor='userLastName'>
+                    Last name
+                  </TypographyStyle>
+                  <TextFieldStyle control={control} name='userLastName' placeholder='Last name' />
+                </Grid>
+
+                <Grid item xs={12} xl={6}>
+                  <TypographyStyle component='label' variant='h5' htmlFor='userGender'>
+                    Gender
+                  </TypographyStyle>
+                  <SelectStyle
+                    control={control}
+                    name='userGender'
+                    options={optionsGender}
+                    title='Chọn giới tính'
                   />
-                </Badge>
-                <input
-                  type='file'
-                  ref={inputFileRef}
-                  style={{ display: 'none' }}
-                  onChange={(e) => handleChangeAvatar(e)}
-                ></input>
-              </Box>
+                </Grid>
+
+                <Grid item xs={12} xl={6}>
+                  <TypographyStyle component='label' variant='h5' htmlFor='userBirthday'>
+                    Birthday
+                  </TypographyStyle>
+                  <DatePickerStyle control={control} name='userBirthday' />
+                </Grid>
+
+                <Grid item xs={12} xl={6}>
+                  <TypographyStyle component='label' variant='h5' htmlFor='userEmail'>
+                    Email
+                  </TypographyStyle>
+                  <TextFieldStyle control={control} name='userEmail' placeholder='Email' />
+                </Grid>
+
+                <Grid item xs={12} xl={6}>
+                  <TypographyStyle component='label' variant='h5' htmlFor='userPhone'>
+                    Phone
+                  </TypographyStyle>
+                  <TextFieldStyle control={control} name='userPhone' placeholder='Phone' />
+                </Grid>
+              </Grid>
+
+              <Grid item xs={12}>
+                <TypographyStyle component='label' variant='h5' htmlFor='userAddress'>
+                  Address
+                </TypographyStyle>
+                <TextFieldStyle control={control} name='userAddress' placeholder='Address' />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TypographyStyle component='label' variant='h5' htmlFor='userEducation'>
+                  Education
+                </TypographyStyle>
+                <TextFieldStyle
+                  control={control}
+                  name='userEducation'
+                  placeholder='Education'
+                  multiline
+                  rows={5}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TypographyStyle component='label' variant='h5' htmlFor='userInformation'>
+                  Additional information
+                </TypographyStyle>
+
+                <CKEditorStyle
+                  control={control}
+                  name='userInformation'
+                  textValue={textValue}
+                  setTextValue={setTextValue}
+                />
+              </Grid>
             </Grid>
-          </Grid>
-
-          <Grid item container xs={12} xl={8} spacing={2}>
-            <Grid item xs={12} xl={6}>
-              <TypographyStyle component='label' variant='h5' htmlFor='userFirstName'>
-                First Name
-              </TypographyStyle>
-              <TextFieldStyle control={control} name='userFirstName' placeholder='First name' />
-            </Grid>
-
-            <Grid item xs={12} xl={6}>
-              <TypographyStyle component='label' variant='h5' htmlFor='userLastName'>
-                Last name
-              </TypographyStyle>
-              <TextFieldStyle control={control} name='userLastName' placeholder='Last name' />
-            </Grid>
-
-            <Grid item xs={12} xl={6}>
-              <TypographyStyle component='label' variant='h5' htmlFor='userGender'>
-                Gender
-              </TypographyStyle>
-              <SelectStyle
-                control={control}
-                name='userGender'
-                options={optionsGender}
-                title='Chọn giới tính'
-              />
-            </Grid>
-
-            <Grid item xs={12} xl={6}>
-              <TypographyStyle component='label' variant='h5' htmlFor='userBirthday'>
-                Birthday
-              </TypographyStyle>
-              <DatePickerStyle control={control} name='userBirthday' />
-            </Grid>
-
-            <Grid item xs={12} xl={6}>
-              <TypographyStyle component='label' variant='h5' htmlFor='userEmail'>
-                Email
-              </TypographyStyle>
-              <TextFieldStyle control={control} name='userEmail' placeholder='Email' />
-            </Grid>
-
-            <Grid item xs={12} xl={6}>
-              <TypographyStyle component='label' variant='h5' htmlFor='userPhone'>
-                Phone
-              </TypographyStyle>
-              <TextFieldStyle control={control} name='userPhone' placeholder='Phone' />
-            </Grid>
-          </Grid>
-
-          <Grid item xs={12}>
-            <TypographyStyle component='label' variant='h5' htmlFor='userAddress'>
-              Address
-            </TypographyStyle>
-            <TextFieldStyle control={control} name='userAddress' placeholder='Address' />
-          </Grid>
-
-          <Grid item xs={12}>
-            <TypographyStyle component='label' variant='h5' htmlFor='userEducation'>
-              Education
-            </TypographyStyle>
-            <TextFieldStyle
-              control={control}
-              name='userEducation'
-              placeholder='Education'
-              multiline
-              rows={5}
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <TypographyStyle component='label' variant='h5' htmlFor='userInformation'>
-              Additional information
-            </TypographyStyle>
-
-            <CKEditorStyle
-              control={control}
-              name='userInformation'
-              textValue={textValue}
-              setTextValue={setTextValue}
-            />
-          </Grid>
-        </Grid>
-        <Button
-          variant='contained'
-          sx={{ fontSize: '1.3rem', mt: 3 }}
-          disabled={isSuccess}
-          onClick={() => handleSaveInformation()}
-        >
-          {isSuccess ? (
-            <>
-              <CircularProgress size='14px' sx={{ mr: 1 }} />
-              Save change...
-            </>
-          ) : (
-            'Save change'
-          )}
-        </Button>
-      </Paper>
+            <Button
+              variant='contained'
+              sx={{ fontSize: '1.3rem', mt: 3 }}
+              disabled={isSuccess}
+              onClick={() => handleSaveInformation()}
+            >
+              {isSuccess ? (
+                <>
+                  <CircularProgress size='14px' sx={{ mr: 1 }} />
+                  Save change...
+                </>
+              ) : (
+                'Save change'
+              )}
+            </Button>
+          </Paper>
+        </>
+      )}
     </>
   );
 }

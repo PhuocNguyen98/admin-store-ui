@@ -142,6 +142,7 @@ function Login({ setToken }) {
             <Typography component='h1' variant='h2' className={cx('title')}>
               Login
             </Typography>
+
             <Box component='form' action='POST' sx={{ mt: 3 }}>
               <Grid container spacing={3}>
                 <Grid item xs={12}>
@@ -234,6 +235,17 @@ function Login({ setToken }) {
                   </p>
                 </Grid>
               </Grid> */}
+              <Box justifyContent='flex-start'>
+                <Typography component='h5' variant='h5' className={cx('title')}>
+                  Thông tin tài khoản test
+                </Typography>
+                <Typography component='h6' variant='h6' className={cx('title')}>
+                  Username: user
+                </Typography>
+                <Typography component='h6' variant='h6' className={cx('title')}>
+                  Password: user@123
+                </Typography>
+              </Box>
             </Box>
           </Box>
         </Container>

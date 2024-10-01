@@ -20,6 +20,7 @@ import Search from '~/components/Search';
 import Loader from '~/components/Loader';
 import TableStyle from '~/components/TableStyle';
 import ToolTipStyle from '~/components/ToolTipStyle';
+import BackdropStyle from '~/components/BackdropStyle';
 import BreadcrumbStyle from '~/components/BreadcrumbStyle';
 import TableHeadStyle from '~/components/TableStyle/TableHeadStyle';
 import TableBodyStyle from '~/components/TableStyle/TableBodyStyle';
@@ -77,6 +78,7 @@ function Supplier() {
   const [pageCurrent, setPageCurrent] = useState(1);
   const [searchValue, setSearchValue] = useState('');
   const debounceValue = useDebounce(searchValue, 500);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { control, setValue, handleSubmit } = useForm({
     defaultValues: {
@@ -135,20 +137,25 @@ function Supplier() {
   // Handle Submit
   const onSubmit = handleSubmit(async (data) => {
     try {
+      setIsSuccess(true);
       const res = await quickUpdateSupplierApi(data);
       if (res?.status === 200) {
         res?.flag ? toast.info(res.message) : toast.success(res.message);
       } else {
         toast.error(res.message);
       }
+      setIsSuccess(false);
     } catch (error) {
       toast.error(error.message);
+      setIsSuccess(false);
     }
   });
 
   useEffect(() => {
-    getDataApi();
-  }, [debounceValue, order, sort, rowsPerPage, pageCurrent]);
+    if (!isSuccess) {
+      getDataApi();
+    }
+  }, [debounceValue, order, sort, rowsPerPage, pageCurrent, isSuccess]);
 
   return (
     <>
@@ -156,7 +163,7 @@ function Supplier() {
         <Loader />
       ) : (
         <div className='wrapper'>
-     
+          <BackdropStyle open={isSuccess} title='Updating...' />
           <BreadcrumbStyle />
           <Box
             sx={{

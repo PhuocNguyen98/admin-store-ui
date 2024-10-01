@@ -29,6 +29,7 @@ import { getAllSupplierApi } from '~/api/supplierApi';
 import { getAllCategoryApi } from '~/api/categoryApi';
 import { getAllDiscountApi } from '~/api/discountApi';
 import { getProductByIdApi, addProductApi, updateProductApi } from '~/api/productApi';
+import Loader from '~/components/Loader';
 
 const schemaProduct = yup.object().shape({
   productName: yup.string().required('Vui lòng nhập tên sản phẩm'),
@@ -82,6 +83,7 @@ function ProductForm() {
   const [productSpecifications, setProductSpecifications] = useState('');
 
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const { handleSubmit, control, watch, setValue, clearErrors } = useForm({
     defaultValues: {
@@ -224,8 +226,10 @@ function ProductForm() {
       } else {
         toast.error(res?.message);
       }
+      setIsLoading(false);
     } catch (error) {
       toast.error(error?.message);
+      setIsLoading(false);
     }
   };
 
@@ -261,317 +265,339 @@ function ProductForm() {
   }, [id]);
 
   return (
-    <Box>
-      <BackdropStyle open={isSuccess} title={id ? ' Updating...' : 'Creating...'} />
-      <Box>
-        <BreadcrumbStyle />
-        <Typography
-          variant='h3'
-          component='h4'
-          sx={{
-            fontWeight: 600,
-            color: 'text.primary',
-          }}
-        >
-          Product
-        </Typography>
-
-        <Typography
-          variant='subtitle1'
-          component='span'
-          gutterBottom
-          sx={{
-            fontSize: '1.4rem',
-            color: '#919aa3',
-            display: 'inline-flex',
-            paddingBottom: 1,
-          }}
-        >
-          {data.length > 0 ? 'Edit product for the system' : 'Create new product for the system'}
-        </Typography>
-      </Box>
-      <Divider />
-
-      <Paper elevation={6} sx={{ p: '30px', mt: 3 }}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} xl={6}>
-            <TypographyStyle component='label' htmlFor='productName' variant='h5' isRequired={true}>
-              Product name
-            </TypographyStyle>
-            <TextFieldStyle control={control} name='productName' placeholder='Product name' />
-          </Grid>
-
-          <Grid item xs={12} xl={6}>
-            <Box
+    <>
+      {id && isLoading ? (
+        <Loader />
+      ) : (
+        <Box>
+          <BackdropStyle open={isSuccess} title={id ? ' Updating...' : 'Creating...'} />
+          <Box>
+            <BreadcrumbStyle />
+            <Typography
+              variant='h3'
+              component='h4'
               sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
+                fontWeight: 600,
+                color: 'text.primary',
               }}
             >
-              <Box flex={1}>
+              Product
+            </Typography>
+
+            <Typography
+              variant='subtitle1'
+              component='span'
+              gutterBottom
+              sx={{
+                fontSize: '1.4rem',
+                color: '#919aa3',
+                display: 'inline-flex',
+                paddingBottom: 1,
+              }}
+            >
+              {data.length > 0
+                ? 'Edit product for the system'
+                : 'Create new product for the system'}
+            </Typography>
+          </Box>
+          <Divider />
+
+          <Paper elevation={6} sx={{ p: '30px', mt: 3 }}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} xl={6}>
+                <TypographyStyle
+                  component='label'
+                  htmlFor='productName'
+                  variant='h5'
+                  isRequired={true}
+                >
+                  Product name
+                </TypographyStyle>
+                <TextFieldStyle control={control} name='productName' placeholder='Product name' />
+              </Grid>
+
+              <Grid item xs={12} xl={6}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <Box flex={1}>
+                    <TypographyStyle
+                      component='label'
+                      variant='h5'
+                      htmlFor='productSlug'
+                      isRequired={true}
+                      comment='Nhấn nút Generate để tạo Slug'
+                    >
+                      Product slug
+                    </TypographyStyle>
+
+                    <TextFieldStyle
+                      control={control}
+                      name='productSlug'
+                      disabled={true}
+                      placeholder='Product slug'
+                    />
+                  </Box>
+                  <ButtonStyle
+                    sx={{ ml: 1, mt: 2 }}
+                    variant='contained'
+                    color='primary'
+                    startIcon={<AutorenewIcon />}
+                    disabled={!!watchProductName ? false : true}
+                    onClick={() => handleGenerateSlug(watchProductName)}
+                  >
+                    Generate slug
+                  </ButtonStyle>
+                </Box>
+              </Grid>
+
+              <Grid item xs={12} xl={4}>
                 <TypographyStyle
                   component='label'
                   variant='h5'
-                  htmlFor='productSlug'
+                  htmlFor='productSupplier'
                   isRequired={true}
-                  comment='Nhấn nút Generate để tạo Slug'
                 >
-                  Product slug
+                  Product supplier
                 </TypographyStyle>
 
-                <TextFieldStyle
+                <SelectStyle
                   control={control}
-                  name='productSlug'
-                  disabled={true}
-                  placeholder='Product slug'
+                  name='productSupplier'
+                  options={supplier}
+                  title='Chọn nhà cung cấp'
                 />
-              </Box>
+              </Grid>
+
+              <Grid item xs={12} xl={4}>
+                <TypographyStyle
+                  component='label'
+                  variant='h5'
+                  htmlFor='productCategory'
+                  isRequired={true}
+                >
+                  Product category
+                </TypographyStyle>
+
+                <SelectStyle
+                  control={control}
+                  name='productCategory'
+                  options={category}
+                  title='Chọn danh mục'
+                />
+              </Grid>
+
+              <Grid item xs={12} xl={4}>
+                <TypographyStyle component='label' variant='h5' htmlFor='productDiscount'>
+                  Product discount
+                </TypographyStyle>
+
+                <SelectStyle
+                  control={control}
+                  name='productDiscount'
+                  options={discount}
+                  title='Chọn chương trình khuyến mãi'
+                />
+              </Grid>
+
+              <Grid item xs={12} xl={4}>
+                <TypographyStyle
+                  component='label'
+                  htmlFor='productSku'
+                  variant='h5'
+                  isRequired={true}
+                >
+                  Product SKU
+                </TypographyStyle>
+                <TextFieldStyle control={control} name='productSku' placeholder='Product SKU' />
+              </Grid>
+
+              <Grid item xs={12} xl={4}>
+                <TypographyStyle
+                  component='label'
+                  htmlFor='productPrice'
+                  variant='h5'
+                  isRequired={true}
+                >
+                  Product price
+                </TypographyStyle>
+                <NumericFormatStyle
+                  control={control}
+                  name='productPrice'
+                  placeholder='Product Price'
+                />
+              </Grid>
+
+              <Grid item xs={12} xl={4}>
+                <TypographyStyle
+                  component='label'
+                  htmlFor='productInventory'
+                  variant='h5'
+                  isRequired={true}
+                >
+                  Product inventory
+                </TypographyStyle>
+
+                <TextFieldStyle control={control} name='productInventory' />
+              </Grid>
+
+              {id ? (
+                <>
+                  <Grid item xs={12} xl={4}>
+                    <TypographyStyle
+                      component='label'
+                      variant='h5'
+                      htmlFor='productStatus'
+                      isRequired={true}
+                    >
+                      Product status
+                    </TypographyStyle>
+
+                    <SelectStyle
+                      control={control}
+                      name='productStatus'
+                      options={optionStatus}
+                      title='Chọn trạng thái'
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} xl={4}>
+                    <TypographyStyle
+                      component='label'
+                      variant='h5'
+                      htmlFor='productDisplay'
+                      isRequired={true}
+                    >
+                      Product display
+                    </TypographyStyle>
+
+                    <SelectStyle
+                      control={control}
+                      name='productDisplay'
+                      options={optionDisplay}
+                      title='Chọn để hiển thị hoặc ẩn sản phẩm'
+                    />
+                  </Grid>
+                </>
+              ) : null}
+
+              <Grid item xs={12}>
+                <TypographyStyle
+                  component='label'
+                  variant='h5'
+                  htmlFor='productThumbnail'
+                  isRequired={true}
+                  comment='Hình ảnh để làm ảnh đại diện cho sản phẩm'
+                >
+                  Product thumbnail
+                </TypographyStyle>
+
+                <DropzoneStyle
+                  control={control}
+                  name='productThumbnail'
+                  multiple={false}
+                  files={productThumbnail}
+                  setFiles={setProductThumbnail}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TypographyStyle
+                  component='label'
+                  variant='h5'
+                  htmlFor='productImages'
+                  comment='Hình ảnh hiển thị trong trang chi tiết sản phẩm'
+                >
+                  Product images
+                </TypographyStyle>
+
+                <DropzoneStyle
+                  control={control}
+                  name='productImages'
+                  multiple={true}
+                  files={productImages}
+                  setFiles={setProductImages}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TypographyStyle
+                  component='label'
+                  variant='h5'
+                  htmlFor='productSpecifications'
+                  comment='Thông số sản phẩm'
+                >
+                  Product specifications
+                </TypographyStyle>
+                <CKEditorStyle
+                  control={control}
+                  name='productSpecifications'
+                  textValue={productSpecifications}
+                  setTextValue={setProductSpecifications}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TypographyStyle
+                  component='label'
+                  variant='h5'
+                  htmlFor='productDescription'
+                  comment='Mô tả sản phẩm'
+                >
+                  Product descriptions
+                </TypographyStyle>
+                <CKEditorStyle
+                  control={control}
+                  name='productDescription'
+                  textValue={productDescription}
+                  setTextValue={setProductDescription}
+                />
+              </Grid>
+            </Grid>
+
+            {data.length > 0 ? (
               <ButtonStyle
-                sx={{ ml: 1, mt: 2 }}
                 variant='contained'
-                color='primary'
-                startIcon={<AutorenewIcon />}
-                disabled={!!watchProductName ? false : true}
-                onClick={() => handleGenerateSlug(watchProductName)}
+                size='large'
+                sx={{ mt: 4 }}
+                disabled={isSuccess}
+                onClick={() => handleEdit()}
               >
-                Generate slug
+                {isSuccess ? (
+                  <>
+                    <CircularProgress size='14px' sx={{ mr: 1 }} />
+                    Update product...
+                  </>
+                ) : (
+                  'Update product'
+                )}
               </ButtonStyle>
-            </Box>
-          </Grid>
-
-          <Grid item xs={12} xl={4}>
-            <TypographyStyle
-              component='label'
-              variant='h5'
-              htmlFor='productSupplier'
-              isRequired={true}
-            >
-              Product supplier
-            </TypographyStyle>
-
-            <SelectStyle
-              control={control}
-              name='productSupplier'
-              options={supplier}
-              title='Chọn nhà cung cấp'
-            />
-          </Grid>
-
-          <Grid item xs={12} xl={4}>
-            <TypographyStyle
-              component='label'
-              variant='h5'
-              htmlFor='productCategory'
-              isRequired={true}
-            >
-              Product category
-            </TypographyStyle>
-
-            <SelectStyle
-              control={control}
-              name='productCategory'
-              options={category}
-              title='Chọn danh mục'
-            />
-          </Grid>
-
-          <Grid item xs={12} xl={4}>
-            <TypographyStyle component='label' variant='h5' htmlFor='productDiscount'>
-              Product discount
-            </TypographyStyle>
-
-            <SelectStyle
-              control={control}
-              name='productDiscount'
-              options={discount}
-              title='Chọn chương trình khuyến mãi'
-            />
-          </Grid>
-
-          <Grid item xs={12} xl={4}>
-            <TypographyStyle component='label' htmlFor='productSku' variant='h5' isRequired={true}>
-              Product SKU
-            </TypographyStyle>
-            <TextFieldStyle control={control} name='productSku' placeholder='Product SKU' />
-          </Grid>
-
-          <Grid item xs={12} xl={4}>
-            <TypographyStyle
-              component='label'
-              htmlFor='productPrice'
-              variant='h5'
-              isRequired={true}
-            >
-              Product price
-            </TypographyStyle>
-            <NumericFormatStyle control={control} name='productPrice' placeholder='Product Price' />
-          </Grid>
-
-          <Grid item xs={12} xl={4}>
-            <TypographyStyle
-              component='label'
-              htmlFor='productInventory'
-              variant='h5'
-              isRequired={true}
-            >
-              Product inventory
-            </TypographyStyle>
-
-            <TextFieldStyle control={control} name='productInventory' />
-          </Grid>
-
-          {id ? (
-            <>
-              <Grid item xs={12} xl={4}>
-                <TypographyStyle
-                  component='label'
-                  variant='h5'
-                  htmlFor='productStatus'
-                  isRequired={true}
-                >
-                  Product status
-                </TypographyStyle>
-
-                <SelectStyle
-                  control={control}
-                  name='productStatus'
-                  options={optionStatus}
-                  title='Chọn trạng thái'
-                />
-              </Grid>
-
-              <Grid item xs={12} xl={4}>
-                <TypographyStyle
-                  component='label'
-                  variant='h5'
-                  htmlFor='productDisplay'
-                  isRequired={true}
-                >
-                  Product display
-                </TypographyStyle>
-
-                <SelectStyle
-                  control={control}
-                  name='productDisplay'
-                  options={optionDisplay}
-                  title='Chọn để hiển thị hoặc ẩn sản phẩm'
-                />
-              </Grid>
-            </>
-          ) : null}
-
-          <Grid item xs={12}>
-            <TypographyStyle
-              component='label'
-              variant='h5'
-              htmlFor='productThumbnail'
-              isRequired={true}
-              comment='Hình ảnh để làm ảnh đại diện cho sản phẩm'
-            >
-              Product thumbnail
-            </TypographyStyle>
-
-            <DropzoneStyle
-              control={control}
-              name='productThumbnail'
-              multiple={false}
-              files={productThumbnail}
-              setFiles={setProductThumbnail}
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <TypographyStyle
-              component='label'
-              variant='h5'
-              htmlFor='productImages'
-              comment='Hình ảnh hiển thị trong trang chi tiết sản phẩm'
-            >
-              Product images
-            </TypographyStyle>
-
-            <DropzoneStyle
-              control={control}
-              name='productImages'
-              multiple={true}
-              files={productImages}
-              setFiles={setProductImages}
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <TypographyStyle
-              component='label'
-              variant='h5'
-              htmlFor='productSpecifications'
-              comment='Thông số sản phẩm'
-            >
-              Product specifications
-            </TypographyStyle>
-            <CKEditorStyle
-              control={control}
-              name='productSpecifications'
-              textValue={productSpecifications}
-              setTextValue={setProductSpecifications}
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <TypographyStyle
-              component='label'
-              variant='h5'
-              htmlFor='productDescription'
-              comment='Mô tả sản phẩm'
-            >
-              Product descriptions
-            </TypographyStyle>
-            <CKEditorStyle
-              control={control}
-              name='productDescription'
-              textValue={productDescription}
-              setTextValue={setProductDescription}
-            />
-          </Grid>
-        </Grid>
-
-        {data.length > 0 ? (
-          <ButtonStyle
-            variant='contained'
-            size='large'
-            sx={{ mt: 4 }}
-            disabled={isSuccess}
-            onClick={() => handleEdit()}
-          >
-            {isSuccess ? (
-              <>
-                <CircularProgress size='14px' sx={{ mr: 1 }} />
-                Update product...
-              </>
             ) : (
-              'Update product'
+              <ButtonStyle
+                variant='contained'
+                size='large'
+                sx={{ mt: 4 }}
+                disabled={isSuccess}
+                onClick={() => handleAdd()}
+              >
+                {isSuccess ? (
+                  <>
+                    <CircularProgress size='14px' sx={{ mr: 1 }} />
+                    Create product...
+                  </>
+                ) : (
+                  'Create product'
+                )}
+              </ButtonStyle>
             )}
-          </ButtonStyle>
-        ) : (
-          <ButtonStyle
-            variant='contained'
-            size='large'
-            sx={{ mt: 4 }}
-            disabled={isSuccess}
-            onClick={() => handleAdd()}
-          >
-            {isSuccess ? (
-              <>
-                <CircularProgress size='14px' sx={{ mr: 1 }} />
-                Create product...
-              </>
-            ) : (
-              'Create product'
-            )}
-          </ButtonStyle>
-        )}
-      </Paper>
-    </Box>
+          </Paper>
+        </Box>
+      )}
+    </>
   );
 }
 

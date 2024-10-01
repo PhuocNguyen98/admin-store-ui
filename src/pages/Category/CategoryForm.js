@@ -14,6 +14,7 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { toast } from 'react-toastify';
 
+import Loader from '~/components/Loader';
 import SelectStyle from '~/components/SelectStyle';
 import ButtonStyle from '~/components/ButtonStyle';
 import DropzoneStyle from '~/components/DropzoneStyle';
@@ -61,6 +62,7 @@ function CategoryForm() {
   const [data, setData] = useState([]); // Save data after call API( by id)
   const [files, setFiles] = useState([]); // Save image
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const { handleSubmit, control, watch, setValue, reset, clearErrors } = useForm({
     defaultValues: {
@@ -158,8 +160,10 @@ function CategoryForm() {
       } else {
         toast.error(res.message);
       }
+      setIsLoading(false);
     } catch (error) {
       toast.error(error.message);
+      setIsLoading(false);
     }
   };
 
@@ -170,166 +174,174 @@ function CategoryForm() {
   }, [id]);
 
   return (
-    <Box>
-      <BackdropStyle open={isSuccess} title={id ? ' Updating...' : 'Creating...'} />
-      <Box>
-        <BreadcrumbStyle />
-
-        <Typography
-          variant='h3'
-          component='h4'
-          sx={{
-            fontWeight: 600,
-            color: 'text.primary',
-          }}
-        >
-          Categories
-        </Typography>
-
-        <Typography
-          variant='subtitle1'
-          component='span'
-          gutterBottom
-          sx={{
-            fontSize: '1.4rem',
-            color: '#919aa3',
-            display: 'inline-flex',
-            paddingBottom: 1,
-          }}
-        >
-          {data.length > 0 ? 'Edit category for the system' : 'Create new category for the system'}
-        </Typography>
-      </Box>
-      <Divider />
-      <Paper elevation={6} sx={{ p: '30px', mt: 3 }}>
-        <Box width='50%' component='form' action='POST'>
-          <Box mb={3}>
-            <TypographyStyle
-              component='label'
-              htmlFor='categoryName'
-              variant='h5'
-              isRequired={true}
-            >
-              Category name
-            </TypographyStyle>
-            <TextFieldStyle control={control} name='categoryName' placeholder='Category name' />
-          </Box>
-
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <Box mb={3} flex={1}>
-              <TypographyStyle
-                component='label'
-                variant='h5'
-                htmlFor='categorySlug'
-                isRequired={true}
-                comment='Click the generate slug button to create the slug'
-              >
-                Category slug
-              </TypographyStyle>
-
-              <TextFieldStyle
-                control={control}
-                name='categorySlug'
-                disabled={true}
-                placeholder='Category slug'
-              />
-            </Box>
-            <ButtonStyle
-              sx={{ ml: 1 }}
-              variant='contained'
-              color='primary'
-              startIcon={<AutorenewIcon />}
-              disabled={!!watchCategoryName ? false : true}
-              onClick={() => handleGenerateSlug(watchCategoryName)}
-            >
-              Generate slug
-            </ButtonStyle>
-          </Box>
-
-          {data.length > 0 ? (
-            <>
-              <Box mb={3}>
-                <TypographyStyle component='label' htmlFor='categoryStatus' variant='h5'>
-                  Category status
-                </TypographyStyle>
-                <SelectStyle
-                  control={control}
-                  name='categoryStatus'
-                  options={optionsStatus}
-                ></SelectStyle>
-              </Box>
-
-              <Box mb={3}>
-                <TypographyStyle component='label' htmlFor='categoryDisplay' variant='h5'>
-                  Category display
-                </TypographyStyle>
-                <SelectStyle
-                  control={control}
-                  name='categoryDisplay'
-                  options={optionsDisplay}
-                ></SelectStyle>
-              </Box>
-            </>
-          ) : null}
-
+    <>
+      {id && isLoading ? (
+        <Loader />
+      ) : (
+        <Box>
+          <BackdropStyle open={isSuccess} title={id ? ' Updating...' : 'Creating...'} />
           <Box>
-            <TypographyStyle component='label' variant='h5' htmlFor='categoryImage'>
-              Category thumbnail
-            </TypographyStyle>
+            <BreadcrumbStyle />
 
-            <DropzoneStyle
-              control={control}
-              name='categoryImage'
-              multiple={false}
-              files={files}
-              setFiles={setFiles}
-            />
+            <Typography
+              variant='h3'
+              component='h4'
+              sx={{
+                fontWeight: 600,
+                color: 'text.primary',
+              }}
+            >
+              Categories
+            </Typography>
+
+            <Typography
+              variant='subtitle1'
+              component='span'
+              gutterBottom
+              sx={{
+                fontSize: '1.4rem',
+                color: '#919aa3',
+                display: 'inline-flex',
+                paddingBottom: 1,
+              }}
+            >
+              {data.length > 0
+                ? 'Edit category for the system'
+                : 'Create new category for the system'}
+            </Typography>
           </Box>
-        </Box>
+          <Divider />
+          <Paper elevation={6} sx={{ p: '30px', mt: 3 }}>
+            <Box width='50%' component='form' action='POST'>
+              <Box mb={3}>
+                <TypographyStyle
+                  component='label'
+                  htmlFor='categoryName'
+                  variant='h5'
+                  isRequired={true}
+                >
+                  Category name
+                </TypographyStyle>
+                <TextFieldStyle control={control} name='categoryName' placeholder='Category name' />
+              </Box>
 
-        {data.length > 0 ? (
-          <ButtonStyle
-            variant='contained'
-            size='large'
-            sx={{ mt: 4 }}
-            disabled={isSuccess}
-            onClick={() => handleEdit()}
-          >
-            {isSuccess ? (
-              <>
-                <CircularProgress size='14px' sx={{ mr: 1 }} />
-                Update category...
-              </>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <Box mb={3} flex={1}>
+                  <TypographyStyle
+                    component='label'
+                    variant='h5'
+                    htmlFor='categorySlug'
+                    isRequired={true}
+                    comment='Click the generate slug button to create the slug'
+                  >
+                    Category slug
+                  </TypographyStyle>
+
+                  <TextFieldStyle
+                    control={control}
+                    name='categorySlug'
+                    disabled={true}
+                    placeholder='Category slug'
+                  />
+                </Box>
+                <ButtonStyle
+                  sx={{ ml: 1 }}
+                  variant='contained'
+                  color='primary'
+                  startIcon={<AutorenewIcon />}
+                  disabled={!!watchCategoryName ? false : true}
+                  onClick={() => handleGenerateSlug(watchCategoryName)}
+                >
+                  Generate slug
+                </ButtonStyle>
+              </Box>
+
+              {data.length > 0 ? (
+                <>
+                  <Box mb={3}>
+                    <TypographyStyle component='label' htmlFor='categoryStatus' variant='h5'>
+                      Category status
+                    </TypographyStyle>
+                    <SelectStyle
+                      control={control}
+                      name='categoryStatus'
+                      options={optionsStatus}
+                    ></SelectStyle>
+                  </Box>
+
+                  <Box mb={3}>
+                    <TypographyStyle component='label' htmlFor='categoryDisplay' variant='h5'>
+                      Category display
+                    </TypographyStyle>
+                    <SelectStyle
+                      control={control}
+                      name='categoryDisplay'
+                      options={optionsDisplay}
+                    ></SelectStyle>
+                  </Box>
+                </>
+              ) : null}
+
+              <Box>
+                <TypographyStyle component='label' variant='h5' htmlFor='categoryImage'>
+                  Category thumbnail
+                </TypographyStyle>
+
+                <DropzoneStyle
+                  control={control}
+                  name='categoryImage'
+                  multiple={false}
+                  files={files}
+                  setFiles={setFiles}
+                />
+              </Box>
+            </Box>
+
+            {data.length > 0 ? (
+              <ButtonStyle
+                variant='contained'
+                size='large'
+                sx={{ mt: 4 }}
+                disabled={isSuccess}
+                onClick={() => handleEdit()}
+              >
+                {isSuccess ? (
+                  <>
+                    <CircularProgress size='14px' sx={{ mr: 1 }} />
+                    Update category...
+                  </>
+                ) : (
+                  'Update category'
+                )}
+              </ButtonStyle>
             ) : (
-              'Update category'
+              <ButtonStyle
+                variant='contained'
+                size='large'
+                sx={{ mt: 4 }}
+                disabled={isSuccess}
+                onClick={() => handleAdd()}
+              >
+                {isSuccess ? (
+                  <>
+                    <CircularProgress size='14px' sx={{ mr: 1 }} />
+                    Create category...
+                  </>
+                ) : (
+                  'Create category'
+                )}
+              </ButtonStyle>
             )}
-          </ButtonStyle>
-        ) : (
-          <ButtonStyle
-            variant='contained'
-            size='large'
-            sx={{ mt: 4 }}
-            disabled={isSuccess}
-            onClick={() => handleAdd()}
-          >
-            {isSuccess ? (
-              <>
-                <CircularProgress size='14px' sx={{ mr: 1 }} />
-                Create category...
-              </>
-            ) : (
-              'Create category'
-            )}
-          </ButtonStyle>
-        )}
-      </Paper>
-    </Box>
+          </Paper>
+        </Box>
+      )}
+    </>
   );
 }
 

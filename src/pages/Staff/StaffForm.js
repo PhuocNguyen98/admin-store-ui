@@ -14,6 +14,7 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { toast } from 'react-toastify';
 
+import Loader from '~/components/Loader';
 import SelectStyle from '~/components/SelectStyle';
 import CKEditorStyle from '~/components/CKEditorStyle';
 import DatePickerStyle from '~/components/DatePickerStyle';
@@ -49,6 +50,7 @@ function StaffForm() {
 
   const [avatar, setAvatar] = useState();
   const [textValue, setTextValue] = useState(''); // Save text CKEditor
+  const [isLoading, setIsLoading] = useState(true);
 
   const { control, setValue } = useForm({
     defaultValues: {
@@ -86,8 +88,10 @@ function StaffForm() {
         setTextValue(result.data[0].information ? result.data[0].information : '');
         setAvatar(result.data[0].avatar);
       }
+      setIsLoading(false);
     } catch (error) {
       toast.error(error.message);
+      setIsLoading(false);
     }
   };
 
@@ -98,141 +102,151 @@ function StaffForm() {
   }, [id]);
 
   return (
-    <Box>
-      <Box>
-        <BreadcrumbStyle />
+    <>
+      {id && isLoading ? (
+        <Loader />
+      ) : (
+        <Box>
+          <Box>
+            <BreadcrumbStyle />
 
-        <Typography
-          variant='h3'
-          component='h4'
-          sx={{
-            fontWeight: 600,
-            color: 'text.primary',
-          }}
-        >
-          Staff
-        </Typography>
+            <Typography
+              variant='h3'
+              component='h4'
+              sx={{
+                fontWeight: 600,
+                color: 'text.primary',
+              }}
+            >
+              Staff
+            </Typography>
 
-        <Typography
-          variant='subtitle1'
-          component='span'
-          gutterBottom
-          sx={{
-            fontSize: '1.4rem',
-            color: '#919aa3',
-            display: 'inline-flex',
-            paddingBottom: 1,
-          }}
-        >
-          View information staff of the system
-        </Typography>
-      </Box>
-      <Divider />
+            <Typography
+              variant='subtitle1'
+              component='span'
+              gutterBottom
+              sx={{
+                fontSize: '1.4rem',
+                color: '#919aa3',
+                display: 'inline-flex',
+                paddingBottom: 1,
+              }}
+            >
+              View information staff of the system
+            </Typography>
+          </Box>
+          <Divider />
 
-      <Paper elevation={6} sx={{ p: '30px', mt: 3 }}>
-        <Grid container spacing={3}>
-          <Grid item container xs={12} xl={4}>
-            <Grid item xs={12}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                <Avatar
-                  alt=''
-                  src={avatar ? avatar : images.imgPlacehoder}
-                  sx={{ width: 280, height: 280 }}
+          <Paper elevation={6} sx={{ p: '30px', mt: 3 }}>
+            <Grid container spacing={3}>
+              <Grid item container xs={12} xl={4}>
+                <Grid item xs={12}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Avatar
+                      alt=''
+                      src={avatar ? avatar : images.imgPlacehoder}
+                      sx={{ width: 280, height: 280 }}
+                    />
+                  </Box>
+                </Grid>
+              </Grid>
+
+              <Grid item container xs={12} xl={8} spacing={2}>
+                <Grid item xs={12} xl={6}>
+                  <TypographyStyle component='label' variant='h5' htmlFor='staffFirstName'>
+                    First Name
+                  </TypographyStyle>
+                  <TextFieldStyle
+                    control={control}
+                    name='staffFirstName'
+                    placeholder='First name'
+                  />
+                </Grid>
+
+                <Grid item xs={12} xl={6}>
+                  <TypographyStyle component='label' variant='h5' htmlFor='staffLastName'>
+                    Last name
+                  </TypographyStyle>
+                  <TextFieldStyle control={control} name='staffLastName' placeholder='Last name' />
+                </Grid>
+
+                <Grid item xs={12} xl={6}>
+                  <TypographyStyle component='label' variant='h5' htmlFor='staffGender'>
+                    Gender
+                  </TypographyStyle>
+                  <SelectStyle
+                    control={control}
+                    name='staffGender'
+                    options={optionsGender}
+                    title='Chọn giới tính'
+                  />
+                </Grid>
+
+                <Grid item xs={12} xl={6}>
+                  <TypographyStyle component='label' variant='h5' htmlFor='staffBirthday'>
+                    Birthday
+                  </TypographyStyle>
+                  <DatePickerStyle control={control} name='staffBirthday' />
+                </Grid>
+
+                <Grid item xs={12} xl={6}>
+                  <TypographyStyle component='label' variant='h5' htmlFor='staffEmail'>
+                    Email
+                  </TypographyStyle>
+                  <TextFieldStyle control={control} name='staffEmail' placeholder='Email' />
+                </Grid>
+
+                <Grid item xs={12} xl={6}>
+                  <TypographyStyle component='label' variant='h5' htmlFor='staffPhone'>
+                    Phone
+                  </TypographyStyle>
+                  <TextFieldStyle control={control} name='staffPhone' placeholder='Phone' />
+                </Grid>
+              </Grid>
+
+              <Grid item xs={12}>
+                <TypographyStyle component='label' variant='h5' htmlFor='staffAddress'>
+                  Address
+                </TypographyStyle>
+                <TextFieldStyle control={control} name='staffAddress' placeholder='Address' />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TypographyStyle component='label' variant='h5' htmlFor='staffEducation'>
+                  Education
+                </TypographyStyle>
+                <TextFieldStyle
+                  control={control}
+                  name='staffEducation'
+                  placeholder='Education'
+                  multiline
+                  rows={5}
                 />
-              </Box>
+              </Grid>
+
+              <Grid item xs={12}>
+                <TypographyStyle component='label' variant='h5' htmlFor='staffInformation'>
+                  Additional information
+                </TypographyStyle>
+
+                <CKEditorStyle
+                  control={control}
+                  name='staffInformation'
+                  textValue={textValue}
+                  setTextValue={setTextValue}
+                />
+              </Grid>
             </Grid>
-          </Grid>
-
-          <Grid item container xs={12} xl={8} spacing={2}>
-            <Grid item xs={12} xl={6}>
-              <TypographyStyle component='label' variant='h5' htmlFor='staffFirstName'>
-                First Name
-              </TypographyStyle>
-              <TextFieldStyle control={control} name='staffFirstName' placeholder='First name' />
-            </Grid>
-
-            <Grid item xs={12} xl={6}>
-              <TypographyStyle component='label' variant='h5' htmlFor='staffLastName'>
-                Last name
-              </TypographyStyle>
-              <TextFieldStyle control={control} name='staffLastName' placeholder='Last name' />
-            </Grid>
-
-            <Grid item xs={12} xl={6}>
-              <TypographyStyle component='label' variant='h5' htmlFor='staffGender'>
-                Gender
-              </TypographyStyle>
-              <SelectStyle
-                control={control}
-                name='staffGender'
-                options={optionsGender}
-                title='Chọn giới tính'
-              />
-            </Grid>
-
-            <Grid item xs={12} xl={6}>
-              <TypographyStyle component='label' variant='h5' htmlFor='staffBirthday'>
-                Birthday
-              </TypographyStyle>
-              <DatePickerStyle control={control} name='staffBirthday' />
-            </Grid>
-
-            <Grid item xs={12} xl={6}>
-              <TypographyStyle component='label' variant='h5' htmlFor='staffEmail'>
-                Email
-              </TypographyStyle>
-              <TextFieldStyle control={control} name='staffEmail' placeholder='Email' />
-            </Grid>
-
-            <Grid item xs={12} xl={6}>
-              <TypographyStyle component='label' variant='h5' htmlFor='staffPhone'>
-                Phone
-              </TypographyStyle>
-              <TextFieldStyle control={control} name='staffPhone' placeholder='Phone' />
-            </Grid>
-          </Grid>
-
-          <Grid item xs={12}>
-            <TypographyStyle component='label' variant='h5' htmlFor='staffAddress'>
-              Address
-            </TypographyStyle>
-            <TextFieldStyle control={control} name='staffAddress' placeholder='Address' />
-          </Grid>
-
-          <Grid item xs={12}>
-            <TypographyStyle component='label' variant='h5' htmlFor='staffEducation'>
-              Education
-            </TypographyStyle>
-            <TextFieldStyle
-              control={control}
-              name='staffEducation'
-              placeholder='Discount slug'
-              multiline
-              rows={5}
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <TypographyStyle component='label' variant='h5' htmlFor='staffInformation'>
-              Additional information
-            </TypographyStyle>
-
-            <CKEditorStyle
-              control={control}
-              name='staffInformation'
-              textValue={textValue}
-              setTextValue={setTextValue}
-            />
-          </Grid>
-        </Grid>
-      </Paper>
-    </Box>
+          </Paper>
+        </Box>
+      )}
+    </>
   );
 }
 

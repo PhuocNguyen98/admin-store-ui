@@ -17,6 +17,7 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { toast } from 'react-toastify';
 
+import Loader from '~/components/Loader';
 import SelectStyle from '~/components/SelectStyle';
 import ButtonStyle from '~/components/ButtonStyle';
 import CKEditorStyle from '~/components/CKEditorStyle';
@@ -72,6 +73,7 @@ function DiscountForm() {
   const [data, setData] = useState([]); // Save data after call API( by id)
   const [files, setFiles] = useState([]); // Save image
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [textValue, setTextValue] = useState(''); // Save text CKEditor
 
   const { handleSubmit, control, watch, setValue, clearErrors } = useForm({
@@ -175,7 +177,11 @@ function DiscountForm() {
       } else {
         toast.error(res?.message);
       }
-    } catch (error) {}
+      setIsLoading(false);
+    } catch (error) {
+      toast.error(error.message);
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -185,228 +191,236 @@ function DiscountForm() {
   }, [id]);
 
   return (
-    <Box>
-      <BackdropStyle open={isSuccess} title={id ? ' Updating...' : 'Creating...'} />
-      <Box>
-        <BreadcrumbStyle />
+    <>
+      {id && isLoading ? (
+        <Loader />
+      ) : (
+        <Box>
+          <BackdropStyle open={isSuccess} title={id ? ' Updating...' : 'Creating...'} />
+          <Box>
+            <BreadcrumbStyle />
 
-        <Typography
-          variant='h3'
-          component='h4'
-          sx={{
-            fontWeight: 600,
-            color: 'text.primary',
-          }}
-        >
-          Discount
-        </Typography>
-
-        <Typography
-          variant='subtitle1'
-          component='span'
-          gutterBottom
-          sx={{
-            fontSize: '1.4rem',
-            color: '#919aa3',
-            display: 'inline-flex',
-            paddingBottom: 1,
-          }}
-        >
-          {data.length > 0 ? 'Edit discount for the system' : 'Create new discount for the system'}
-        </Typography>
-      </Box>
-      <Divider />
-
-      <Paper elevation={6} sx={{ p: '30px', mt: 3 }}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} xl={6}>
-            <TypographyStyle
-              component='label'
-              htmlFor='discountName'
-              variant='h5'
-              isRequired={true}
-            >
-              Discount name
-            </TypographyStyle>
-            <TextFieldStyle control={control} name='discountName' placeholder='Discount name' />
-          </Grid>
-
-          <Grid item xs={12} xl={6}>
-            <Box
+            <Typography
+              variant='h3'
+              component='h4'
               sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
+                fontWeight: 600,
+                color: 'text.primary',
               }}
             >
-              <Box flex={1}>
+              Discount
+            </Typography>
+
+            <Typography
+              variant='subtitle1'
+              component='span'
+              gutterBottom
+              sx={{
+                fontSize: '1.4rem',
+                color: '#919aa3',
+                display: 'inline-flex',
+                paddingBottom: 1,
+              }}
+            >
+              {data.length > 0
+                ? 'Edit discount for the system'
+                : 'Create new discount for the system'}
+            </Typography>
+          </Box>
+          <Divider />
+
+          <Paper elevation={6} sx={{ p: '30px', mt: 3 }}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} xl={6}>
+                <TypographyStyle
+                  component='label'
+                  htmlFor='discountName'
+                  variant='h5'
+                  isRequired={true}
+                >
+                  Discount name
+                </TypographyStyle>
+                <TextFieldStyle control={control} name='discountName' placeholder='Discount name' />
+              </Grid>
+
+              <Grid item xs={12} xl={6}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <Box flex={1}>
+                    <TypographyStyle
+                      component='label'
+                      variant='h5'
+                      htmlFor='discountSlug'
+                      isRequired={true}
+                      comment='Nhấn nút Generate để tạo Slug'
+                    >
+                      Discount slug
+                    </TypographyStyle>
+                    <TextFieldStyle
+                      control={control}
+                      name='discountSlug'
+                      disabled={true}
+                      placeholder='Discount slug'
+                    />
+                  </Box>
+
+                  <ButtonStyle
+                    sx={{ ml: 1, mt: 2 }}
+                    variant='contained'
+                    color='primary'
+                    startIcon={<AutorenewIcon />}
+                    disabled={!!watchDiscountName ? false : true}
+                    onClick={() => handleGenerateSlug(watchDiscountName)}
+                  >
+                    Generate slug
+                  </ButtonStyle>
+                </Box>
+              </Grid>
+
+              <Grid item xs={12} xl={data.length > 0 ? 3 : 4}>
+                <TypographyStyle
+                  component='label'
+                  htmlFor='discountPercent'
+                  variant='h5'
+                  isRequired={true}
+                  comment='Nhập % giảm giá'
+                >
+                  Discount percent
+                </TypographyStyle>
+
+                <FormControlStyle fullWidth>
+                  <OutlinedInputStyle
+                    control={control}
+                    name='discountPercent'
+                    endAdornment={<InputAdornment position='start'>%</InputAdornment>}
+                    placeholder='Discount percent'
+                  />
+                </FormControlStyle>
+              </Grid>
+
+              <Grid item xs={12} xl={data.length > 0 ? 3 : 4}>
+                <TypographyStyle
+                  component='label'
+                  htmlFor='discountStartTime'
+                  variant='h5'
+                  isRequired={true}
+                  comment='Chọn thời gian bắt đầu áp dụng giảm giá'
+                >
+                  Start time
+                </TypographyStyle>
+
+                <DatePickerStyle control={control} name='discountStartTime' />
+              </Grid>
+
+              <Grid item xs={12} xl={data.length > 0 ? 3 : 4}>
+                <TypographyStyle
+                  component='label'
+                  htmlFor='discountEndTime'
+                  variant='h5'
+                  isRequired={true}
+                  comment='Chọn thời gian kết thúc áp dụng giảm giá'
+                >
+                  End time
+                </TypographyStyle>
+
+                <DatePickerStyle control={control} name='discountEndTime' />
+              </Grid>
+
+              {data.length > 0 ? (
+                <Grid item xs={12} xl={3}>
+                  <TypographyStyle component='label' htmlFor='discountStatus' variant='h5'>
+                    Discount status
+                  </TypographyStyle>
+                  <SelectStyle
+                    control={control}
+                    name='discountStatus'
+                    options={optionsStatus}
+                  ></SelectStyle>
+                </Grid>
+              ) : null}
+
+              <Grid item xs={12}>
                 <TypographyStyle
                   component='label'
                   variant='h5'
-                  htmlFor='discountSlug'
-                  isRequired={true}
-                  comment='Nhấn nút Generate để tạo Slug'
+                  htmlFor='discountImage'
+                  comment='Không bắt buộc'
                 >
-                  Discount slug
+                  Discount thumbnail
                 </TypographyStyle>
-                <TextFieldStyle
+
+                <DropzoneStyle
                   control={control}
-                  name='discountSlug'
-                  disabled={true}
-                  placeholder='Discount slug'
+                  name='discountImage'
+                  multiple={false}
+                  files={files}
+                  setFiles={setFiles}
                 />
-              </Box>
+              </Grid>
 
-              <ButtonStyle
-                sx={{ ml: 1, mt: 2 }}
-                variant='contained'
-                color='primary'
-                startIcon={<AutorenewIcon />}
-                disabled={!!watchDiscountName ? false : true}
-                onClick={() => handleGenerateSlug(watchDiscountName)}
-              >
-                Generate slug
-              </ButtonStyle>
-            </Box>
-          </Grid>
+              <Grid item xs={12}>
+                <TypographyStyle
+                  component='label'
+                  variant='h5'
+                  htmlFor='discountImage'
+                  comment='Không bắt buộc'
+                >
+                  Discriptions
+                </TypographyStyle>
 
-          <Grid item xs={12} xl={data.length > 0 ? 3 : 4}>
-            <TypographyStyle
-              component='label'
-              htmlFor='discountPercent'
-              variant='h5'
-              isRequired={true}
-              comment='Nhập % giảm giá'
-            >
-              Discount percent
-            </TypographyStyle>
-
-            <FormControlStyle fullWidth>
-              <OutlinedInputStyle
-                control={control}
-                name='discountPercent'
-                endAdornment={<InputAdornment position='start'>%</InputAdornment>}
-                placeholder='Discount percent'
-              />
-            </FormControlStyle>
-          </Grid>
-
-          <Grid item xs={12} xl={data.length > 0 ? 3 : 4}>
-            <TypographyStyle
-              component='label'
-              htmlFor='discountStartTime'
-              variant='h5'
-              isRequired={true}
-              comment='Chọn thời gian bắt đầu áp dụng giảm giá'
-            >
-              Start time
-            </TypographyStyle>
-
-            <DatePickerStyle control={control} name='discountStartTime' />
-          </Grid>
-
-          <Grid item xs={12} xl={data.length > 0 ? 3 : 4}>
-            <TypographyStyle
-              component='label'
-              htmlFor='discountEndTime'
-              variant='h5'
-              isRequired={true}
-              comment='Chọn thời gian kết thúc áp dụng giảm giá'
-            >
-              End time
-            </TypographyStyle>
-
-            <DatePickerStyle control={control} name='discountEndTime' />
-          </Grid>
-
-          {data.length > 0 ? (
-            <Grid item xs={12} xl={3}>
-              <TypographyStyle component='label' htmlFor='discountStatus' variant='h5'>
-                Discount status
-              </TypographyStyle>
-              <SelectStyle
-                control={control}
-                name='discountStatus'
-                options={optionsStatus}
-              ></SelectStyle>
+                <CKEditorStyle
+                  control={control}
+                  name='discountDescription'
+                  textValue={textValue}
+                  setTextValue={setTextValue}
+                />
+              </Grid>
             </Grid>
-          ) : null}
 
-          <Grid item xs={12}>
-            <TypographyStyle
-              component='label'
-              variant='h5'
-              htmlFor='discountImage'
-              comment='Không bắt buộc'
-            >
-              Discount thumbnail
-            </TypographyStyle>
-
-            <DropzoneStyle
-              control={control}
-              name='discountImage'
-              multiple={false}
-              files={files}
-              setFiles={setFiles}
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <TypographyStyle
-              component='label'
-              variant='h5'
-              htmlFor='discountImage'
-              comment='Không bắt buộc'
-            >
-              Discriptions
-            </TypographyStyle>
-
-            <CKEditorStyle
-              control={control}
-              name='discountDescription'
-              textValue={textValue}
-              setTextValue={setTextValue}
-            />
-          </Grid>
-        </Grid>
-
-        {data.length > 0 ? (
-          <ButtonStyle
-            variant='contained'
-            size='large'
-            sx={{ mt: 4 }}
-            disabled={isSuccess}
-            onClick={() => handleEdit()}
-          >
-            {isSuccess ? (
-              <>
-                <CircularProgress size='14px' sx={{ mr: 1 }} />
-                Update discount...
-              </>
+            {data.length > 0 ? (
+              <ButtonStyle
+                variant='contained'
+                size='large'
+                sx={{ mt: 4 }}
+                disabled={isSuccess}
+                onClick={() => handleEdit()}
+              >
+                {isSuccess ? (
+                  <>
+                    <CircularProgress size='14px' sx={{ mr: 1 }} />
+                    Update discount...
+                  </>
+                ) : (
+                  'Update discount'
+                )}
+              </ButtonStyle>
             ) : (
-              'Update discount'
+              <ButtonStyle
+                variant='contained'
+                size='large'
+                sx={{ mt: 4 }}
+                disabled={isSuccess}
+                onClick={() => handleAdd()}
+              >
+                {isSuccess ? (
+                  <>
+                    <CircularProgress size='14px' sx={{ mr: 1 }} />
+                    Create discount...
+                  </>
+                ) : (
+                  'Create discount'
+                )}
+              </ButtonStyle>
             )}
-          </ButtonStyle>
-        ) : (
-          <ButtonStyle
-            variant='contained'
-            size='large'
-            sx={{ mt: 4 }}
-            disabled={isSuccess}
-            onClick={() => handleAdd()}
-          >
-            {isSuccess ? (
-              <>
-                <CircularProgress size='14px' sx={{ mr: 1 }} />
-                Create discount...
-              </>
-            ) : (
-              'Create discount'
-            )}
-          </ButtonStyle>
-        )}
-      </Paper>
-    </Box>
+          </Paper>
+        </Box>
+      )}
+    </>
   );
 }
 

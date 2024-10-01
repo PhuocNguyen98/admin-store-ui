@@ -14,7 +14,9 @@ import config from '~/config';
 import useDebounce from '~/hooks/useDebounce';
 
 import Search from '~/components/Search';
+import Loader from '~/components/Loader';
 import TableStyle from '~/components/TableStyle';
+import BackdropStyle from '~/components/BackdropStyle';
 import BreadcrumbStyle from '~/components/BreadcrumbStyle';
 import TableHeadStyle from '~/components/TableStyle/TableHeadStyle';
 import TableBodyStyle from '~/components/TableStyle/TableBodyStyle';
@@ -24,7 +26,6 @@ import ToolTipStyle from '~/components/ToolTipStyle';
 import { getCategoryApi, quickUpdateCategoryApi } from '~/api/categoryApi';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import Loader from '~/components/Loader';
 
 // Define column table
 const columns = [
@@ -77,6 +78,7 @@ function Category() {
   const [searchValue, setSearchValue] = useState('');
   const debounceValue = useDebounce(searchValue, 500);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSuccess, setIsSuccess] = useState(false);
   const { control, setValue, handleSubmit } = useForm({
     defaultValues: {
       formList: [],
@@ -134,20 +136,25 @@ function Category() {
   // Handle Submit
   const onSubmit = handleSubmit(async (data) => {
     try {
+      setIsSuccess(true);
       const res = await quickUpdateCategoryApi(data);
       if (res?.status === 200) {
         res?.flag ? toast.info(res.message) : toast.success(res.message);
       } else {
         toast.error(res.message);
       }
+      setIsSuccess(false);
     } catch (error) {
       toast.error(error.message);
+      setIsSuccess(false);
     }
   });
 
   useEffect(() => {
-    getDataApi();
-  }, [debounceValue, order, sort, rowsPerPage, pageCurrent]);
+    if (!isSuccess) {
+      getDataApi();
+    }
+  }, [debounceValue, order, sort, rowsPerPage, pageCurrent, isSuccess]);
 
   return (
     <>
@@ -155,6 +162,7 @@ function Category() {
         <Loader />
       ) : (
         <div className='wrapper'>
+          <BackdropStyle open={isSuccess} title='Updating...' />
           <BreadcrumbStyle />
           <Box
             sx={{
