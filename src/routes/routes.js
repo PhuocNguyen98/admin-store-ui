@@ -31,6 +31,7 @@ import Profile from '~/pages/Profile';
 export const privateRoutes = [
   { path: config.routes.logout, component: Logout, layout: null },
   { path: config.routes.dashboard, component: Dashboard },
+  { path: '/', component: Dashboard },
   // Category
   { path: config.routes.category, component: Category },
   { path: config.category.add, component: CategoryForm },
@@ -61,6 +62,4 @@ export const privateRoutes = [
 ];
 
 //routes not login
-export const publicRoutes = [
-  { path: config.routes.login, component: Login, layout: null },
-];
+export const publicRoutes = [{ path: config.routes.login, component: Login, layout: null }];

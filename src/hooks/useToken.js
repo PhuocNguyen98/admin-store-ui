@@ -10,8 +10,12 @@ export default function useToken() {
     return userToken;
   };
 
+  const getRefreshToken = () => {
+    return localStorage.getItem('refresh_token');
+  };
+
   const [token, setToken] = useState(getToken());
-  const [refreshToken, setRefreshToken] = useState('');
+  const [refreshToken, setRefreshToken] = useState(getRefreshToken());
 
   const saveToken = (userToken) => {
     localStorage.setItem('access_token', userToken?.access_token);
@@ -23,6 +27,7 @@ export default function useToken() {
 
   const clearToken = () => {
     localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
   };
 
   return {
