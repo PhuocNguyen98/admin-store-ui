@@ -114,7 +114,7 @@ function Header() {
               }}
             >
               <Avatar
-                sx={{ width: 40, height: 40 }}
+                sx={{ width: 40, height: 40, border: '1px solid #ccc' }}
                 src={dataUser.data?.avatar ? dataUser.data.avatar : images.staffPlacehoder}
                 alt='Avatar'
               />
