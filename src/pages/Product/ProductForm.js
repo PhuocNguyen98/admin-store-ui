@@ -183,7 +183,6 @@ function ProductForm() {
 
   // Handle click edit submit
   const handleEdit = handleSubmit(async (data) => {
-    console.log(1);
     setIsSuccess(true);
     let formData = handleFormData(data);
     formData.append('productStatus', data.productStatus);
