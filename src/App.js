@@ -1,4 +1,4 @@
-import { Fragment, useEffect } from 'react';
+import { Fragment } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import { privateRoutes } from '~/routes';
@@ -14,13 +14,13 @@ function App() {
 
   return (
     <>
-      <ToastContainer />
       {!token || token === 'undefined' ? (
         <Router>
           <Login setToken={setToken} />
         </Router>
       ) : (
         <Router>
+          <ToastContainer />
           <div className='app'>
             <Routes>
               {privateRoutes.map((route, index) => {
